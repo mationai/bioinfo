@@ -422,7 +422,7 @@ def wrapSubpeptides(peptide:str) -> Strs:
    pLen = len(peptide)
    if pLen < 2:
       return Strs()
-   res = StrsSet()
+   res = set[str]() #StrsSet()
 
    for i in range(1, len(peptide)-2):
       res.add(peptide[-1]+peptide[:i+1])

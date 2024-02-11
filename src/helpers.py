@@ -1,6 +1,7 @@
 import timeit
 import os
 from sys import argv
+from superpipe import pipes
 from extensions import *
 
 # def histogram[T](L:list[T]) -> dict[T, int]:
@@ -128,12 +129,12 @@ def parseProfile(d) -> Profile:
 # def parseMats(st:str, sep='-\n') -> list[IntMat]:
 #    return [parseMat(s) for s in st.split(sep)]
 
-# def pairsStrToStrPairs(st:str, sep='\n', pairSep='|') -> StrPairs:
-#    res = StrPairs()
-#    for s in st.split(sep):
-#       a, b = s.split(pairSep)
-#       res.append((a, b))
-#    return res
+def pairsStrToStrPairs(st:str, sep='\n', pairSep='|') -> StrPairs:
+   res = [] #StrPairs()
+   for s in st.split(sep):
+      a, b = s.split(pairSep)
+      res.append((a, b))
+   return res
 
 # def pairStrsToStrPairs(strs:Strs, sep='\n', pairSep='|') -> StrPairs:
 #    res = StrPairs()
@@ -156,31 +157,32 @@ def parseProfile(d) -> Profile:
 #       res.append('-'.join([str(i) for i in L]))
 #    return ' '.join(sorted(res) if sort else res)
 
-# def toPairsStrs(pairs:Pairs, sep='|') -> Strs:
-#    """ Returns list of "(a1|b1)" representation of input pairs
-#    """
-#    return [f"({a}{sep}{b})" for a, b in pairs]
+def toPairsStrs(pairs:Pairs, sep='|') -> Strs:
+   """ Returns list of "(a1|b1)" representation of input pairs
+   """
+   return [f"({a}{sep}{b})" for a, b in pairs]
 
-# def toPairsStr(pairs:Pairs, sort=True) -> str:
-#    """ Returns sorted(default) "(a1|b1) (a2|b2) ..." representation of input pairs
-#    """
-#    strs = pairs |> toPairsStrs
-#    if sort:
-#       strs.sort()
-#    return strs |> sepWithSp
+@pipes
+def toPairsStr(pairs:Pairs, sort=True) -> str:
+   """ Returns sorted(default) "(a1|b1) (a2|b2) ..." representation of input pairs
+   """
+   strs = pairs >> toPairsStrs
+   if sort:
+      strs.sort()
+   return strs >> sepWithSp
 
 def adjGraphStr(sg:Graph) -> str:
    res = [f"{x}: {' '.join(sg[x])}" for x in sg]
    return '\n'.join(res)
 
-# def pathArrowStr[T](S:list[T], arrow=' -> ') -> str:
-#    return arrow.join([str(s) for s in S])
+def pathArrowStr[T](S:list[T], arrow=': ') -> str:
+   return arrow.join([str(s) for s in S])
 
 # def pathsArrowStr[T](SS:list[list[T]], arrow=' -> ') -> str:
 #    return '\n'.join([pathArrowStr(S, arrow) for S in SS])
 
-# def rmSpaces(s:str) -> str:
-#    return s.replace(' ', '')
+def rmSpaces(s:str) -> str:
+   return s.replace(' ', '')
 
 def dPath(p:str):
    dir = os.path.dirname(__file__)

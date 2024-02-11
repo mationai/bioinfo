@@ -1,6 +1,6 @@
 from extensions import *
 from helpers import product, maxXY, maxIdx, zeros
-from graphlib import copyWG
+from graphfns import copyWG
 
 
 def minPickDP(total:int, valueSet:Ints) -> int:

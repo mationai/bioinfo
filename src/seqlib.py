@@ -1,7 +1,7 @@
-from extensions import *
 from superpipe import pipes
 from pipe import permutations
 from functional import seq
+from extensions import *
 from helpers import dPath
 
 A = 'A'

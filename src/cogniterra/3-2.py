@@ -1,10 +1,11 @@
 from superpipe import pipes
 import sys
 sys.path.append('src')
+from dataexpected import expected
 from extensions import *
 from helpers import *
 from seq2graph import Seq2Graph
-from graphlib import *
+from graphfns import *
 from seqlib import permsOfLen
 
 @pipes
@@ -13,62 +14,69 @@ class chap3:
    def _7():
       s = '''0: 3
       1: 0
-      2: 1,6
+      2: 1 6
       3: 2
       4: 2
       5: 4
-      6: 5,8
+      6: 5 8
       7: 9
       8: 7
       9: 6'''
       S = eulerianPath(parseGraph(s), 'cycle', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('2->1->0->3->2->6->8->7->9->6->5->4->2')
+      pathArrowStr(S, ' ') >> testVs('2 1 0 3 2 6 8 7 9 6 5 4 2')
+      # same as '6 8 7 9 6 5 4 2 1 0 3 2 6' in solution
 
-      s = '1: 2|2: 1,2|0: 1'
+      s = '1: 2|2: 1 2|0: 1'
       S = eulerianPath(parseGraph(s, '|'), 'cycle', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('')
+      S >> pathArrowStr >> testVs('')
 
       s = '''1: 10
-      10: 2,3,4
+      10: 2 3 4
       2: 1
       3: 10
       4: 5
       5: 10'''
       S = eulerianPath(parseGraph(s), 'cycle', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('10->2->1->10->3->10->4->5->10')
+      pathArrowStr(S, ' ')\
+         >> testVs('10 2 1 10 3 10 4 5 10')
 
-      s = '''0: 1,2,3,4
-      1: 0,2,3,4
-      2: 0,1,3,4
-      3: 0,1,2,4
-      4: 0,1,2,3'''
+      s = '''0: 1 2 3 4
+      1: 0 2 3 4
+      2: 0 1 3 4
+      3: 0 1 2 4
+      4: 0 1 2 3'''
       S = eulerianPath(parseGraph(s), 'cycle', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('0->1->0->2->0->3->0->4->1->2->1->3->1->4->2->3->2->4->3->4->0')
+      pathArrowStr(S, ' ')\
+         >> testVs('0 1 0 2 0 3 0 4 1 2 1 3 1 4 2 3 2 4 3 4 0')
 
-      s = '0: 3,1|1: 2|2: 0|3: 0'
+      s = '0: 3 1|1: 2|2: 0|3: 0'
       S = eulerianPath(parseGraph(s, '|'), 'cycle', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('0->3->0->1->2->0')
+      pathArrowStr(S, ' ') >> testVs('0 3 0 1 2 0')
 
-      gs = readGraphStr('dataset_203_2.txt') 
-      o = read('2-2-1.2.2-out.txt')
-      eulerianPath(gs, 'cycle', '') >> pathArrowStr >> rmSpaces >> testVs(o)
+      gs = readGraphStrs('dataset_34403_7.txt')
+      S = eulerianPath(gs, 'cycle', '')
+      pathArrowStr(S, ' ') >> testVs(expected._3_7)
 
    # Find Eulerian Path
    def _8():
       s = '''0: 2
       1: 3
       2: 1
-      3: 0,4
-      6: 3,7
+      3: 0 4
+      6: 3 7
       7: 8
       8: 9
       9: 6'''
       S = eulerianPath(parseGraph(s), 'path', '')
-      S >> pathArrowStr >> rmSpaces >> testVs('6->7->8->9->6->3->0->2->1->3->4')
+      pathArrowStr(S, ' ') >> testVs('6 7 8 9 6 3 0 2 1 3 4')
 
-      gs = readGraphStr('dataset_203_6.txt')
-      o = read('2-2-1.2.6-out.txt')
-      eulerianPath(gs, 'path', '') >> pathArrowStr >> rmSpaces >> testVs(o)
+      gs = readGraphStrs('dataset_34403_8a.txt')
+      S = eulerianPath(gs, 'path', '')
+      pathArrowStr(S, ' ') >> testVs(expected._3_8)
+
+      gs = readGraphStrs('dataset_34403_8.txt')
+      S = eulerianPath(gs, 'path', '')
+      pathArrowStr(S, ' ') >> testVs('9 2 1 3 6 4 5 3 0 2 7')
 
    # Reconstruct Genome from scrambled seqs
    def _9():
@@ -87,11 +95,10 @@ class chap3:
       S = parseSeqsStr('AG AT AA GA GG GT TA TG TT AT')
       genomeFromSeqs(S, 'path', '') >> testIn(['AAGTTGGATAT', 'AGATAATGGTT'])
 
-      l = readlines('dataset_203_7.txt')
-      o = read('2-2-1.2.7-out.txt')
-      parseSeqStrs(l[1:]) >> genomeFromSeqs('path', '') >> testVs(o)
-
-   # 1.2.9 - only 1 k-Universal Circular Path and its reverse, so answer = 2
+      l = readlines('dataset_34403_9.txt')
+      S = parseSeqsStr(l[1])
+      gs = genomeFromSeqs(S, 'path', '')
+      gs >> testVs(expected._3_9)
 
    # Find k-Universal Circular String
    def _10():
@@ -101,10 +108,10 @@ class chap3:
       S = permsOfLen(4, '01')
       genomeFromSeqs(S, 'universal', '') >> testVs('0010011010111100')
 
-      S = permsOfLen(9, '01')
+      S = permsOfLen(9, '01') # data is '9'
       genomeFromSeqs(S, 'universal', '') >> testVs('10100000000010000001010000010010000011000000011010000100010000101010000110010000111000000111010100010010100011000100011010100100010100101010100110000100110010100111000100111011000001011000011011000101011000110011000111001000111011100001011100011011100101011100110011100111100000111100100100101100100110100100111101000101101000111101100101101100110101100111110000111110100101110100110110100111111000101111000111111100101111100110111101010101101010111101110101101110110101110111110110110111111010111111111011110011')
 
-   # 1.3 - Assembling Genomes from Read-Pairs
+   # Assembling Genomes from Read-Pairs
 
    # Generate (k, d)-mer Composition of a pattern 
    # Reconstruct genome from Pairs
@@ -130,6 +137,14 @@ class chap3:
 
       sp = pairsStrToStrPairs('GGG|GGG AGG|GGG GGG|GGT GGG|GGG GGG|GGG', ' ')
       genomeFromPairs(sp, 3, 2) >> testVs('AGGGGGGGGGGT')
+
+      l = readlines('dataset_34403_11dbg.txt')
+      [k, n] = parseInts(l[0])
+      sp = pairsStrToStrPairs(l[1], ' ')
+      s = genomeFromPairs(sp, k, n)
+      s[0:172] >> testVs(expected._3_11[0:172])
+      s[-172:] >> testVs(expected._3_11[-172:])
+      # print(s) # string too long for testVs(), even their check failed
 
    # NOTE: not correct. Using maxNonBranchingPaths should help 
    def _12():
@@ -159,7 +174,7 @@ class chap3:
       S = parseGraph('1: 2|2: 3|3: 4,5|6: 7|7: 6', '|')
       maxNonBranchingPaths(S) >> pathsArrowStr >> testVs('1: 2: 3\n3: 4\n3: 5\n6: 7: 6')
 
-      S = readGraphStr('dataset_6207_2.txt')
+      S = readGraphStrs('dataset_6207_2.txt')
       o = read('2-2-1.6.2-out.txt')
       maxNonBranchingPaths(S) >> pathsArrowStr >> testVs(o)
 
@@ -177,6 +192,8 @@ class chap3:
       r[0] >> testVs('CATCCAAAGGGACGAGATCAAAACCGGTAGTACCAGCCGTTTTCGACACTGGGAATTTCCCTAATAAGA')
       r[-1] >> testVs('TTACAAAACGCTCCCACACAGTATCACCTTGTTGTGCAAAATCGAAGGTCTTGGTCTGGCGCGGCTGTACCAGATTAGCAAGAACGCGCCCAGGATCTTACCCAGATCCCCAGAGGTCGTTCCGTTTGATGCATC')
 
+if run(7):
+   chap3._7()
 if run(8):
    chap3._8()
 if run(9):
