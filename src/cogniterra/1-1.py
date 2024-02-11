@@ -40,6 +40,9 @@ class chap1:
 
    # Find reverse complement of dna
    def _4():
+      rc = reverseComp('AAAACCCGGT')
+      rc >> testVs('ACCGGGTTTT')
+
       dna = readlines('dataset_33716_4a.txt')[0]
       rc = reverseComp(dna)
       [rc[:6], rc[-6:]] >> testVs(['GGGTTC', 'CGATGT'])

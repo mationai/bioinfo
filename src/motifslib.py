@@ -24,14 +24,40 @@ def acgtHistogram(motifs:Seqs, initCnt=1) -> dict[str, list[int]]:
          res[c][j] += 1
    return res
 
+def motifsEnum(seqs:Seqs, k:int, d=1, sort=True) -> Seqs:
+   """
+   Find motifs in seqs with at most d mismatch, brute force.
+   Eg. k=3, d=1, seqs=[ATTTGGC TGCCTTA CGGTATC GAAAATT]
+   gives [ATA ATT GTT TTT]
+   """
+   # print('seqs',seqs)
+   kmers = set[str]()
+   for i, seq in enumerate(seqs):
+      # print('to slide',s)
+      for kmer in slide(seq, k):
+         for kmr in permulate(kmer, d):
+            if len(kmr) == k and\
+             matchedAll(seqs[:i] + seqs[i+1:], kmr, d):
+            # if matchedAll(seqs[:i] + seqs[i+1:], kmr, d):
+               kmers.add(kmr)
+   res = list(kmers)
+   return sorted(res) if sort else res
+
 def motifsProfile(motifs:Seqs, initCnt=1) -> Profile:
-   """ Returns {
-     'A': [position-0 count / motifs count, ...]
+   """ 
+   Motifs profile is a matrix of probabilities of each nucleotide
+     at each position in motifs, where probability is:
+      count of nucleotide / count of motifs
+   Returns {
+     'A': [probabilities...]
      ...
    }
    """
    counts = acgtHistogram(motifs, initCnt)
-   return {c: [x/float(len(motifs)) for x in counts[c]] for c in counts}
+   return {
+      c: [x/float(len(motifs)) for x in counts[c]]
+         for c in counts
+   }
 
 def motifsScore(motifs:Seqs, initCnt=1) -> int:
    """ Returns
@@ -44,22 +70,23 @@ def motifsScore(motifs:Seqs, initCnt=1) -> int:
    counts = acgtHistogram(motifs, initCnt)
 
    for i in range(motifLen):
-      for c in 'ACGT':
+      for c in ACGT:
          if maxcount[i] < counts[c][i]:
             maxcount[i] = counts[c][i] 
    return sum(len(motifs) - maxcount[i] for i in range(motifLen))
 
 def motifsEntropy(motifs:Seqs) -> float:
-   """ Entropy is a measure of the uncertainty of a probability distribution of motifs profile
+   """ Returns Entropy = measure of the
+   uncertainty of a probability distribution of motifs profile
    """
    res = 0.0
    profile = motifsProfile(motifs)
    for i in range(len(motifs[0])):
       entropy = 0.0
-      for c in 'ACGT':
-         prob = profile[c][i]
-         if prob > 0:
-            entropy += abs(prob * log2(prob))
+      for c in ACGT:
+         p = profile[c][i]
+         if p > 0:
+            entropy += abs(p * log2(p))
       res += entropy
    return res
 
@@ -102,7 +129,10 @@ def mostProbableSeq(seqs:Seqs, profile:Profile) -> str:
 
 def greedyMotifSearch(seqs:Seqs, k:int, initCnt=1):
    """
-   Similar to seqlib.medianKmer().
+   Like medianKmer, but much faster, less accurate.
+   Accuracy somewhat mitigated by having non-0s as profile, 
+    done via initCnt=1 (pseudocounts).
+
    Returns a kmer for each str where kmer has best match across seqs. Eg: 
    ggcgttCAGgca 1 
    aagaatCAGtca 1
@@ -111,7 +141,7 @@ def greedyMotifSearch(seqs:Seqs, k:int, initCnt=1):
    CAAtaatattcg 0
         Score = 2
    http://www.mrgraeme.co.uk/greedy-motif-search/
-   https://stepik.org/lesson/29500/step/8?unit=10361 - eg.(need week3 progress to access)
+   https://cogniterra.org/lesson/29870/step/1?unit=21968
    Note: The performance of function deteriorate if first string in Dna does not
     contain k-mers similar to the consensus motif. Thus, biologists often run
     it multiple times, shuffling the strings in Dna each time.
@@ -143,11 +173,11 @@ def bestProfileMotifs(profile:Profile, seqs:Seqs) -> Seqs:
    return res
 
 def iRandj(seqs:Seqs, k:int):
-   seqLen = len(seqs[0])
+   seqLen = min([len(s) for s in seqs])
    for i in range(len(seqs)):
       yield i, random.randint(0, seqLen-k)
 
-def randMotifSearch(seqs:Seqs, k:int) -> Seqs: 
+def _randMotifSearch(seqs:Seqs, k:int) -> Seqs: 
    """ Returns motifs of k-len
    """
    seqLen = len(seqs[0])
@@ -161,12 +191,15 @@ def randMotifSearch(seqs:Seqs, k:int) -> Seqs:
          return res
 
 def iterRandMotifSearch(seqs:Seqs, k:int, iters=1000) -> Seqs:
-   """ Returns motifs of k-len, by running randMotifSearch n times
+   """ 
+   Note: Often wrong res on small inputs, tried iters=2000, no help
+
+   Returns motifs of k-len, by running randMotifSearch n times
    """
    score = len(seqs[0]) * len(seqs)
-   res = Seqs()
+   res = []
    for _ in range(iters):
-      motifs = randMotifSearch(seqs, k)
+      motifs = _randMotifSearch(seqs, k)
       score_ = motifsScore(motifs)
       if score_ < score:
          score = score_
@@ -199,6 +232,8 @@ def genKmer(dna:str, profile:Profile, k:int) -> str:
 
 def gibbsSampler(seqs:Seqs, k:int, iters=3000, seedIters=300) -> Seqs:
    """
+   Note: Often wrong res on small inputs, tried iters=5000, seedIters=500, no help
+
    GibbsSampler explores just a small subset of solutions, it may "get stuck" in a local optimum.
    For this reason, similarly to randMotifSearch, it should be run many times with the hope that
     one of these runs will produce the best-scoring motifs.
@@ -206,14 +241,13 @@ def gibbsSampler(seqs:Seqs, k:int, iters=3000, seedIters=300) -> Seqs:
     AAAAAAAAGGGGGGG (each time with new randomly selected k-mers for N = 200 iterations),
     it returns a collection Motifs with consensus string AAAAAAgAGGGGGGt and Score(Motifs)
     equal to 38. This score is even lower than the score of 40 expected from the implanted motifs!
-   Note: Can only get desired output sometimes, tried iters=5000, seedIters=500, no help
    """
    bestScore = len(seqs[0]) * len(seqs)
-   res = Seqs()
+   res = []
 
    # run randMotifSearch few times to seed initial motifs
    for i in range(seedIters):
-      motifs = randMotifSearch(seqs, k)
+      motifs = _randMotifSearch(seqs, k)
       score = motifsScore(motifs)
       if score < bestScore:
          bestScore = score
@@ -233,15 +267,16 @@ def gibbsSampler(seqs:Seqs, k:int, iters=3000, seedIters=300) -> Seqs:
 
 def maxPossibleMotifScore(n:int, motifLen:int) -> int:
    """
-   Maximum score occurs when the motif matrix is "least conserved", i.e. when the
-    maximum number of a single letter in a column is minimized.
-   This occurs when each letter occurs numMofits / 4 times in each column. 
-   If n is not a multiple of 4, then there will be one letter that occurs
-    more than n/4 times in a column.  This letter occurs ceiling(n/4) times.
+   Maximum score occurs when the motif matrix is "least conserved",
+    i.e. when the max # of one letter in a column is minimized.
+   This occurs when each letter occurs numMofits/4 times in each col. 
+   If n is not a multiple of 4, then there will be one letter that 
+    occurs more than n/4 times in a column. 
+    This letter occurs ceiling(n/4) times.
    Multiply this by motifLen columns for maximum possible score.
    """
    return int(motifLen * (n - ceil(n/4)))
 
 ## aliases ##
 def motifEnum(seqs:Seqs, k:int, d:int) -> Seqs:
-   return kmerEnums(seqs, k, d)
+   return motifsEnum(seqs, k, d)

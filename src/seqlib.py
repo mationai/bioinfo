@@ -127,8 +127,9 @@ def reverseComp(dna:str):
       .replace('A', 't').replace('T', 'a')\
       .replace('C', 'g').replace('G', 'c').upper()
 
-def mostFreqKmers(dna:str, k:int, d=0, revComp=False,
-                  sort=True) -> list[Seqs, int]:
+def mostFreqKmers(
+    dna:str, k:int, d=0, revComp=False, sort=True
+   ) -> list[Seqs, int]:
    """ Returns the most most freq k-mers in dna by d-distance or less.
    If revComp=True, account for reverse complement too.
    """
@@ -164,46 +165,31 @@ def permsOfLen(k:int, ptnStr=ACGTStr) -> Seqs:
       res.append(str(s))
    return res if k > 0 else Seqs()
 
-def kmerEnums(seqs:Seqs, k:int, d=1, sort=True) -> Seqs:
-   """
-   All k-mers that appear in seqs with at most d mismatches. 
-   Eg. k=3, d=1, seqs=[ATTTGGC TGCCTTA CGGTATC GAAAATT]
-   gives [ATA ATT GTT TTT]
-   """
-   # print('seqs',seqs)
-   kmers = set[str]()
-   for i, s in enumerate(seqs):
-      # print('to slide',s)
-      for kmer in slide(s, k):
-         for kmr in permulate(kmer, d):
-            if len(kmr) == k and\
-             matchedAll(seqs[:i] + seqs[i+1:], kmr, d):
-            # if matchedAll(seqs[:i] + seqs[i+1:], kmr, d):
-               kmers.add(kmr)
-   res = list(kmers)
-   return sorted(res) if sort else res
-
-def distIn(seqs:Seqs, pattern:str) -> int:
+def distSum(seqs:Seqs, pattern:str) -> int:
    """ Eg. pattern of AAA:
    d(AAA, TTACCT[TAA]C) = 1
    d(AAA, [ACG]GCGTTCG) = 2
-   d(AAA, CCCT[AAA]GAG) = 0 = 1+2 = 3
+   d(AAA, CCCT[AAA]GAG) = 0
+                    sum = 3
    """
    k = len(pattern)
-   dist = 0
-   for s in seqs:
-      hamD = len(s)
-      for ptn in slide(s, k):
-         _hamD = hamming(pattern, ptn)
-         if hamD > _hamD:
-            hamD = _hamD
-      dist += hamD
-   return dist
+   d = 0
 
-def medianKmer(seqs:Seqs, k:int) -> str:
+   for seq in seqs:
+      hamD = len(seq)
+      for ptn in slide(seq, k):
+         _hamD = hamming(pattern, ptn)
+         if pattern == 'AAAAAA' and _hamD < hamD:
+          print(_hamD, hamD, ptn, seq)
+         if _hamD < hamD:
+            hamD = _hamD
+      d += hamD
+   return d
+
+def medianKmer(seqs:Seqs, k:int) -> list[str, int]:
    """
    Find kmer that w/ least dist over all k-mers in seqs
-   Eg.    AAA dist 
+   Eg.        dist of AAA 
    ttaccttAAC 1
    gATAtctgtc 1
    ACGgcgttcg 2
@@ -212,13 +198,15 @@ def medianKmer(seqs:Seqs, k:int) -> str:
    dist sum = 5
    """
    dist = len(seqs) * k
-   res = ''
-   for kmer in permsOfLen(k):
-      dist_ = distIn(seqs, kmer)
-      if dist > dist_:
-         dist = dist_
-         res = kmer
-   return res
+   kmer = ''
+   for kmr in permsOfLen(k):
+      d = distSum(seqs, kmr)
+      # print(d, kmr)
+      if d < dist:
+         print('<', d, kmr)
+         dist = d
+         kmer = kmr
+   return [kmer, dist]
 
 @pipes
 def getClumps(dna:str, k:int, L:int, minTimes:int, sort=True) -> Seqs:

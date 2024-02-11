@@ -45,6 +45,7 @@ class chap1:
 
    # Find Hamming dist btw Pattern and every k-mer substring of seq
    def _10():
+      indexesIn('AACAAGCTGATAAACATTTAAAGAG', 'AAAAA', 2) >> len >> testVs(11)
       indexesIn('TTTAGAGCCTTCAGAGG', 'GAGG', 2) >> len >> testVs(4)
 
       [ptn, s, n] = readlines('dataset_33716_10a.txt')

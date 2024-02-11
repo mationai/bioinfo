@@ -16,10 +16,10 @@ def printRuntime(t0:float, deci=1):
    print('Elapsed time:',
       round(timeit.default_timer() - t0, deci))
 
-def sepWithSp[T](L:list[T]) -> str:
+def sepWithSp(L:list) -> str:
    return ' '.join([str(x) for x in L])
 
-def sepWithNL[T](L:list[T]) -> str:
+def sepWithNL(L:list) -> str:
    return '\n'.join([str(x) for x in L])
 
 def run(n:int) -> bool:
@@ -61,28 +61,26 @@ def run(n:int) -> bool:
 #          print(f"{i}: got {a[i]}, expected {b[i]}")
 #          cnt += 1
 
-def testVs[T](exp:T, res:T):
+def testVs(exp:T, res:T):
    if exp == res:
       print("✓ result as expected")
    else:
       print("  result:", res)
       print("expected:", exp)
 
-# def testColl[T](A:list[T], B:list[T]):
-#    matchedX = set[int]()
-#    matchedY = set[int]()
-#    for x, a in enumerate(A): 
-#       for y, b in enumerate(B): 
-#          if a == b and x not in matchedX and y not in matchedY:
-#             matchedX.add(x)
-#             matchedY.add(y)
-#    if len(matchedX)==len(A) and len(matchedY)==len(B):
-#       print("✓ result as expected")
-#    else:
-#       print("  result:", A)
-#       print("expected:", B)
-
-# # Much simpler logic if can map(type, list)
+def testColl(A:List[T], B:List[T]):
+   matchedX = set[int]()
+   matchedY = set[int]()
+   for x, a in enumerate(A): 
+      for y, b in enumerate(B): 
+         if a == b and x not in matchedX and y not in matchedY:
+            matchedX.add(x)
+            matchedY.add(y)
+   if len(matchedX)==len(A) and len(matchedY)==len(B):
+      print("✓ result as expected")
+   else:
+      print("  result:", B)
+      print("expected:", A)
 
 def parseInts(s:str, sep=' ') -> Ints:
    return [int(x) for x in s.split(sep) if x.strip()]
