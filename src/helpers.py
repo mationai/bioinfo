@@ -12,6 +12,22 @@ from extensions import *
 # def runningSums[T](L:list[T]) -> list[T]:
 #    return [sum(L[:i]) for i in range(len(L)+1)]
 
+# def mergeOrderedSeqs(seqs:list):
+# # def mergeOrderedSeqs[T](seqs:list[T]) -> T:
+#    """ Concat adjacent seqs. Eg. abc, bcd -> abcd
+#    """
+#    if len(seqs) == 1:
+#       return seqs[0]
+#    if len(seqs) < 1:
+#       print('WARN: mergeOrderedSeqs -> "" due to empty input seqs')
+#       return T('')
+#    res = seqs[0]
+#    # n = len(res)-1
+#    for i, dna in enumerate(seqs[1:]): 
+#       if res[i+1:] == dna[:-1]:
+#          res += dna[-1]
+#    return res
+
 def printRuntime(t0:float, deci=1):
    print('Elapsed time:',
       round(timeit.default_timer() - t0, deci))
@@ -35,15 +51,15 @@ def run(n:int) -> bool:
          return True
    return False
 
+def testIn(B:list, a):
 # def testIn[T](a:T, B:list[T]):
-#    if any(a==x for x in B):
-#       print("✓ result as expected")
-#    elif len(B)==1:
-#       print("  result:", a)
-#       print("expected:", B[0])
-#    else:
-#       print("     result:", a)
-#       print("exp one of:", B)
+   if any(a==x for x in B):
+      print("✓ result as expected")
+   elif len(B)==1:
+      print("  result:", a)
+      print("expected:", B[0])
+   else:
+      print("a not in B")
 
 # def testVerbose[T](a:T, b:T):
 #    if a == b:
@@ -61,14 +77,16 @@ def run(n:int) -> bool:
 #          print(f"{i}: got {a[i]}, expected {b[i]}")
 #          cnt += 1
 
-def testVs(exp:T, res:T):
+def testVs(exp, res):
+# def testVs[T](exp:T, res:T):
    if exp == res:
       print("✓ result as expected")
    else:
       print("  result:", res)
       print("expected:", exp)
 
-def testColl(A:List[T], B:List[T]):
+def testColl(A:list, B:list):
+# def testColl[T](A:List[T], B:List[T]):
    matchedX = set[int]()
    matchedY = set[int]()
    for x, a in enumerate(A): 
@@ -82,22 +100,23 @@ def testColl(A:List[T], B:List[T]):
       print("  result:", B)
       print("expected:", A)
 
-def parseInts(s:str, sep=' ') -> Ints:
+def parseInts(s:str, sep=' ') -> [int]:#Ints:
    return [int(x) for x in s.split(sep) if x.strip()]
 
 # def parseIntsList(S:Strs, sep=' ') -> list[Ints]:
 #    return [parseInts(s) for s in S]
 
-def parseFloats(s:str, sep=' ') -> Floats:
+def parseFloats(s:str, sep=' ') -> [float]:#Floats:
    return [float(x) for x in s.split(sep) if x.strip()]
 
 # def parseToStrs(s:str, sep=' ') -> Strs:
 #    return [x for x in s.split(sep) if x.strip()]
 
-def parseSeqsStr(s:str, sep=' ') -> Seqs:
+def parseSeqsStr(s:str, sep=' ') -> [str]:#Seqs:
    return [str(x) for x in s.split(sep) if x.strip()]
 
-def parseSeqStrs(S:Strs) -> Seqs:
+def parseSeqStrs(S:[str]) -> [str]:
+# def parseSeqStrs(S:Strs) -> Seqs:
    return [str(x) for x in S if x.strip()]
 
 def parseProfile(d) -> Profile:
@@ -151,7 +170,7 @@ def parseProfile(d) -> Profile:
 #    return strs |> sepWithSp
 
 def adjGraphStr(sg:Graph) -> str:
-   res = [f"{x} -> {','.join(sg[x])}" for x in sg]
+   res = [f"{x}: {' '.join(sg[x])}" for x in sg]
    return '\n'.join(res)
 
 # def pathArrowStr[T](S:list[T], arrow=' -> ') -> str:
@@ -177,7 +196,8 @@ def readlines(p:str) -> list[str]:
    f = open(dPath(p), 'r')
    return f.read().splitlines()
 
-def product[T](nums:list[T]) -> T:
+def product(nums:list):
+# def product[T](nums:list[T]) -> T:
    res = nums[0]
    for n in nums[1:]:
       if n == 0:

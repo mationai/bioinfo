@@ -178,7 +178,8 @@ def iRandj(seqs:Seqs, k:int):
       yield i, random.randint(0, seqLen-k)
 
 def _randMotifSearch(seqs:Seqs, k:int) -> Seqs: 
-   """ Returns motifs of k-len
+   """ 
+   Returns motifs of k-len
    """
    seqLen = len(seqs[0])
    res = motifs = [seqs[i][j:j+k] for i, j in iRandj(seqs, k)]
@@ -192,6 +193,7 @@ def _randMotifSearch(seqs:Seqs, k:int) -> Seqs:
 
 def iterRandMotifSearch(seqs:Seqs, k:int, iters=1000) -> Seqs:
    """ 
+   Like medianKmer, but score better
    Note: Often wrong res on small inputs, tried iters=2000, no help
 
    Returns motifs of k-len, by running randMotifSearch n times

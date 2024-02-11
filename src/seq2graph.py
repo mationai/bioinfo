@@ -80,5 +80,11 @@ class Seq2Graph:
          res[x].append(seqs[i+1])
       return res
 
+   def toStrs(self) -> [str]:
+      return [f"{x}: {' '.join(self.sg[x])}" for x in self.sg]
+
+   def toStr(self) -> str:
+      return adjGraphStr(self.sg)
+
    def __str__(self) -> str:
       return adjGraphStr(self.sg)
