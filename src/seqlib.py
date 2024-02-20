@@ -15,7 +15,7 @@ ACGTStr = 'ACGT'
 # list(gen()) gives "bus error": compiler bug https://github.com/seq-lang/seq/issues/102
 
 
-def insert[T](a:list[T], i:int, x:T):
+def insert(a:list, i:int, x): #[T](a:list[T], i:int, x:T):
    # insert Bug: https://github.com/seq-lang/seq/issues/106 
    if i >= len(a):
       a.append(x)
@@ -44,7 +44,7 @@ def indexesSeq(dna:str, ptn:str, maxD=0):
 
 ## fixme what's d, passed to indexesSeq but not used there
 @pipes
-def indexesIn(dna:str, ptn:str, maxD=0) -> list[int]:
+def indexesIn(dna:str, ptn:str, maxD=0) -> Ints:
    """ Like indexesSeq(), but returns actual list, not a generator
    """
    return indexesSeq(dna, ptn, maxD) >> list()
@@ -62,7 +62,7 @@ def matchedAll(seqs:Seqs, ptn:str, d=0) -> bool:
 def frequentKmers(dna:str, k:int):
    """ Returns most freq k-mers in dna
    """
-   cnt = dict[str, int]()
+   cnt = dict() #dict[str, int]()
    for kmr in slide(dna, k):
       cnt[kmr] = cnt[kmr]+1 if kmr in cnt else 0
 
@@ -100,7 +100,7 @@ def permulate(ptn:str, d:int, sort=False) -> Seqs:
    elif len(ptn) == 1:
       return ACGT
 
-   res = set[str]()
+   res = set() #set[str]()
    if d > 1:
       for i, toNot in enumerate(ptn):
          end = '' if i + 1 == len(ptn) else ptn[i +1:]
@@ -129,12 +129,11 @@ def reverseComp(dna:str):
 
 def mostFreqKmers(
     dna:str, k:int, d=0, revComp=False, sort=True
-   ) -> list[Seqs, int]:
+   ) -> list: #list[Seqs, int]:
    """ Returns the most most freq k-mers in dna by d-distance or less.
    If revComp=True, account for reverse complement too.
    """
-   # cnts = {}
-   cnts = dict[str, int]()
+   cnts = dict() #dict[str, int]()
    kmrs = slide(dna, k)
    if d <= 0:
       for kmr in kmrs:
@@ -186,7 +185,7 @@ def distSum(seqs:Seqs, pattern:str) -> int:
       d += hamD
    return d
 
-def medianKmer(seqs:Seqs, k:int) -> list[str, int]:
+def medianKmer(seqs:Seqs, k:int) -> list: #list[str, int]:
    """
    Find kmer that w/ least dist over all k-mers in seqs
    Eg.        dist of AAA 
@@ -213,7 +212,7 @@ def getClumps(dna:str, k:int, L:int, minTimes:int, sort=True) -> Seqs:
    """ All distinct k-mers forming (L, t)-clumps in Genome.
    i.e. distinct k-mers that occurs >= minTimes within L-length in dna
    """ 
-   idxs = dict[str, list[int]]()
+   idxs = dict() #dict[str, list[int]]()
    for i, kmr in slide(dna, k) >> enumerate:
       if kmr in idxs and len(idxs[kmr]) < minTimes:
          for idx in idxs[kmr]:
@@ -226,7 +225,7 @@ def getClumps(dna:str, k:int, L:int, minTimes:int, sort=True) -> Seqs:
    return sorted(res) if sort else res
 
 @pipes
-def getSkew(dna:str, skew0=0) -> list[int]:
+def getSkew(dna:str, skew0=0) -> Ints:
    """ Returns skew (running sum of ACTG->+-1/0 mapping) of sequence
    """
    def nextSkew(k, n=0):
@@ -248,13 +247,13 @@ def minSkewIndices(dna:str):
    low = min(getSkew(dna))
    return [i for i, n in enumerate(getSkew(dna)) if n == low]
 
-def minSkewInFile(filename:str) -> list[int]:
+def minSkewInFile(filename:str) -> Ints:
    """ Returns indices of min skews of sequence in file
    FASTA('path/Salmonella_enterica.fa') # will work in later releases.
    """
    f = open(dPath(filename), 'r')
-   skews = list[list[int]]()
-   lows = list[int]()
+   skews = [] #list[list[int]]()
+   lows = [] #list[int]()
    low = 0
    lineLen = 0 
 

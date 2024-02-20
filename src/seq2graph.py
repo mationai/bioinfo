@@ -8,13 +8,12 @@ class Seq2Graph:
    def __init__(self, dna:Seqs, method:str, k:int):
       """ Returns de Bruijn graph via:
       """
-      match method:
-         case 'seq':
-            self.sg = self.fromSeq(dna[0], k)
-         case 'overlap': # Don't use bad result, use 'kmers'
-            self.sg = self.viaOverlap(dna)
-         case _:
-            self.sg = self.fromKmers(dna)
+      if method == 'seq':
+         self.sg = self.fromSeq(dna[0], k)
+      elif method == 'overlap': # Don't use bad result, use 'kmers'
+         self.sg = self.viaOverlap(dna)
+      else:
+         self.sg = self.fromKmers(dna)
 
    def fromKmers(self, kmers:Seqs) -> Graph:
       """ Returns Graph Graph where each node value is of length kmer-length - 1 
@@ -31,7 +30,7 @@ class Seq2Graph:
       if len(kmers) == 0:
          raise ValueError('Can not build adjacencyGraph from empty seqs')
 
-      # Set k to be length of k-mer to look at, not length input kmers 
+      # Set k to be length of k-mer to look at, which is length of first kmer -1
       k = len(kmers[0]) - 1
       if k < 1:
          raise ValueError('Can not build adjacencyGraph via "kmers" method with k=0')
@@ -39,9 +38,10 @@ class Seq2Graph:
       for kmer in kmers:
          x, y = [str(s) for s in slide(kmer, k)]
          if x in res:
-            res[x].append(y)
+            res[x].append(y) # want all mappings, including dups, so no set
          else:
             res[x] = [y]
+      # print(res)
       return res
 
    def viaOverlap(self, dna:Seqs) -> Graph:
@@ -80,7 +80,7 @@ class Seq2Graph:
          res[x].append(seqs[i+1])
       return res
 
-   def toStrs(self) -> [str]:
+   def toStrs(self) -> Strs:
       return [f"{x}: {' '.join(self.sg[x])}" for x in self.sg]
 
    def toStr(self) -> str:

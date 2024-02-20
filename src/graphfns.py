@@ -31,6 +31,20 @@ def readGraphStrs(p:str) -> Graph:
 # def copyWG(wg:WGraph) -> WGraph:
 #    return {k: v[:] for k, v in wg.items()}
 
+def getCountsGraph(g:Graph) -> dict:
+   counts = {}
+   # eg. A->B
+   for node, outs in g.items():
+      counts[node] = (0, len(outs)) # A = (0, 1)
+
+   for node, outs in g.items():
+      for out in outs:
+         if out not in counts:
+            counts[out] = (0, 0)
+         x, y = counts[out]
+         counts[out] = x + 1, y # B = (1, 0)
+   return counts
+
 def eulerianPath(sg:Graph, kind:str, start:str) -> Strs:
    """ See http://www.graph-magics.com/articles/euler.php
    kind one of:
@@ -119,14 +133,14 @@ def eulerianPath(sg:Graph, kind:str, start:str) -> Strs:
    res.reverse()
    return res
 
-def mergeOrderedSeqs[T](seqs:List[T]) -> T:
+def mergeOrderedSeqs(seqs:List) -> str:
    """ Concat adjacent seqs. Eg. abc, bcd -> abcd
    """
    if len(seqs) == 1:
       return seqs[0]
    if len(seqs) < 1:
       print('WARN: mergeOrderedSeqs -> "" due to empty input seqs')
-      return T('')
+      return ''
    res = seqs[0]
    # n = len(res)-1
    for i, dna in enumerate(seqs[1:]): 
@@ -156,14 +170,14 @@ def pairedComposition(ptn:str, k:int, d:int) -> Pairs:
    l = len(ptn) -k -d -2
    return [(x, y) for x,y in zip(s[:l], s[k+d:])]
 
-def unzip(strPairs:StrPairs) -> tuple[Strs, Strs]: 
+def unzip(strPairs:StrPairs) -> tuple:#[Strs, Strs]: 
    """ a, b = zip(*sps) (doesn't work in str)
    """
    A = [sp[0] for sp in strPairs]
    B = [sp[1] for sp in strPairs]
    return A, B
 
-def unzipToSeqs(strPairs:StrPairs) -> tuple[Seqs, Seqs]: 
+def unzipToSeqs(strPairs:StrPairs) -> tuple:#[Seqs, Seqs]: 
    """ a, b = zip(*sps) (doesn't work in str)
    """
    A = [str(sp[0]) for sp in strPairs]
@@ -177,93 +191,140 @@ def unzipToSeqs(strPairs:StrPairs) -> tuple[Seqs, Seqs]:
 #       return S
 #    return [s+S[i+1] for i, s in enumerate(S[:-1])]
 
-# def isTunnelNode(src:str, sg:Graph) -> bool:
-#    """ Return if src in sg has only 1 other node pointing to it
-#    and if ag[src] has only 1 node
-#    Q: Still a tunnel of another node points to src and other nodes?
-#    """
-#    if src not in sg or len(sg[src]) != 1:
-#       return False
-#    cnt = 0
-#    for vals in sg.values():
-#       cnt += sum([1 for v in vals if v == src])
-#    return cnt == 1
+def isTunnelNode(src:str, sg:Graph) -> bool:
+   """ Return if src in sg has only 1 other node pointing to it
+   and if ag[src] has only 1 node
+   Q: Still a tunnel of another node points to src and other nodes?
+   """
+   if src not in sg or len(sg[src]) != 1:
+      return False
+   cnt = 0
+   for vals in sg.values():
+      cnt += sum([1 for v in vals if v == src])
+      if cnt > 1:
+         return False
+   return cnt == 1
 
-# def maxNonBranchingPaths(sg:Graph) -> list[Strs]:
-#    """ Returns non-branching paths in sg
-#    """
-#    res = list[Strs]()
-#    seen = set[str]() # StrsSet()
-#    for src, vals in sg.items():
-#       if not isTunnelNode(src, sg):
-#          for val in vals:
-#             path = [src, val]
-#             v = val
-#             isTunnel = isTunnelNode(v, sg)
-#             while isTunnel:
-#                v = sg[v][0] if len(sg[v]) > 0 else ''
-#                if v != '':
-#                   path.append(v)
-#                   seen.add(v)
-#                isTunnel = isTunnelNode(v, sg)
-#             res.append(path)
-#             seen.add(val)
-#          seen.add(src)
-#    for src, vals in sg.items():
-#       if not src in seen:
-#          path = [src]
-#          v = vals[0] if len(vals) > 0 else ''
-#          while v != '' and v != src:
-#             path.append(v)
-#             seen.add(v)
-#             v = sg[v][0] if len(sg[v]) > 0 else ''
-#          if v == src:
-#             path.append(src)
-#          res.append(path)
-#          seen.add(src)
-#    return res
+def standardize(cycle):
+   mm = min(cycle)
+   ii = cycle.index(mm)
+   return cycle[ii:] + cycle[:ii] + [mm]
 
-# def contigsFromSeq(ptn:str, k:int) -> Strs:
-#    """ Generate Contig - long, segments of non-branching genome from a str 
-#    Eg. (see L2-2 1.4.4), k=3 (kmer or edge len)
-#    ptn = TAATGCCATGGGATGTT
-#    ->
-#    [TAAT TGTT TGCCAT ATG ATG ATG TGG GGG GGAT]
-#    """
-#    kmers = list(slide(ptn, k))
-#    sg = Seq2Graph(kmers, 'kmers', 0).sg
-#    path = eulerianPath(sg, 'path', '')
-#    stack = Strs()
-#    res = Strs()
+def make_cycle(start, graph):
+   cycle = [start]
+   node = start
+   while node in graph and len(graph[node]) == 1:
+      succ = graph[node][0]
+      if succ == start:
+         return standardize(cycle)
+      else:
+         cycle.append(succ)
+         node = succ
+   return []
 
-#    for p in path:
-#       if p in sg and len(sg[p]) == 1:
-#          stack.append(p)
-#       else:
-#          res.append(mergeOrderedSeqs(stack + [p]))
-#          stack = [p]
-#    return res
+def isolated_cycles(graph:Graph):
+   cycles = []
+   for node in graph.keys():
+      cycle = make_cycle(node, graph)
+      if len(cycle) > 0 and cycle not in cycles:
+         cycles.append(cycle)
+   return cycles
 
-# def contigs(kmers:Seqs) -> Strs:
-#    """ Generate Contig - long, segments of non-branching genome from kmers
-#    """
-#    sg = Seq2Graph(kmers, 'kmers', 0).sg
-#    paths = maxNonBranchingPaths(sg)
-#    return [mergeOrderedSeqs(p) for p in paths]
+def maxNonBranchingPathsAlt(graph:Graph) -> List[Strs]:
+   ''' from mhrnciar/bioinformatics-algorithms, same result
+   '''
+   paths = []
+   cnts = getCountsGraph(graph)
 
-# def genomeFromOrderedPairs(strPairs:StrPairs, k:int, d:int) -> str:
-#    """ Construct genome from ordered pairs, aka "string spelled by gapped patterns"
-#    """
-#    A, B = unzip(strPairs) 
-#    ptns1 = strPairs[0][0] + ''.join([a[-1] for a in A[1:]])
-#    ptns2 = strPairs[0][1] + ''.join([b[-1] for b in B[1:]])
-#    l = len(ptns1)
-#    if ptns1[k+d:] != ptns2[:l-k-d]:
-#       print('WARN: No string spelled by the gapped patterns')
-#    return str(ptns1 + ptns2[-(k+d):])
+   for v in cnts: # ptn v
+      (ins, outs) = cnts[v] # in/out counts of ptn v
+      if (ins != 1 or outs != 1) and outs > 0:
+         for w in graph[v]: # ptn w, out of v
+            nonBranchPaths = [v, w]
+            w_in, w_out = cnts[w]
+            while w_in == 1 and w_out == 1:
+               u = graph[w][0] # keep adding to nbp until w is not a tunnel
+               nonBranchPaths.append(u)
+               w = u
+               w_in, w_out = cnts[w]
+            paths.append(nonBranchPaths)
+   return isolated_cycles(graph) + paths
+
+def maxNonBranchingPaths(sg:Graph) -> List[Strs]:
+   """ 3.14 Returns non-branching paths in sg
+   """
+   res = list()
+   seen = set() # StrsSet()
+   for src, vals in sg.items():
+      if not isTunnelNode(src, sg):
+         for val in vals:
+            path = [src, val]
+            v = val
+            isTunnel = isTunnelNode(v, sg)
+            while isTunnel:
+               v = sg[v][0] if len(sg[v]) > 0 else ''
+               if v != '':
+                  path.append(v)
+                  seen.add(v)
+               isTunnel = isTunnelNode(v, sg)
+            res.append(path)
+            seen.add(val)
+         seen.add(src)
+   for src, vals in sg.items():
+      if not src in seen:
+         path = [src]
+         v = vals[0] if len(vals) > 0 else ''
+         while v != '' and v != src:
+            path.append(v)
+            seen.add(v)
+            v = sg[v][0] if len(sg[v]) > 0 else ''
+         if v == src:
+            path.append(src)
+         res.append(path)
+         seen.add(src)
+   return res
+
+def contigsFromSeq(ptn:str, k:int) -> Strs:
+   """ Generate Contig - long, segments of non-branching genome from a str 
+   Eg. (see L2-2 1.4.4), k=3 (kmer or edge len)
+   ptn = TAATGCCATGGGATGTT
+   ->
+   [TAAT TGTT TGCCAT ATG ATG ATG TGG GGG GGAT]
+   """
+   kmers = list(slide(ptn, k))
+   sg = Seq2Graph(kmers, 'kmers', 0).sg
+   path = eulerianPath(sg, 'path', '')
+   stack = Strs()
+   res = Strs()
+
+   for p in path:
+      if p in sg and len(sg[p]) == 1:
+         stack.append(p)
+      else:
+         res.append(mergeOrderedSeqs(stack + [p]))
+         stack = [p]
+   return res
+
+def contigs(kmers:Seqs) -> Strs:
+   """ Generate Contig - long, segments of non-branching genome from kmers
+   """
+   sg = Seq2Graph(kmers, 'kmers', 0).sg
+   paths = maxNonBranchingPaths(sg)
+   return [mergeOrderedSeqs(p) for p in paths]
+
+def genomeFromOrderedPairs(strPairs:StrPairs, k:int, d:int) -> str:
+   """ Construct genome from ordered pairs, aka "string spelled by gapped patterns"
+   """
+   A, B = unzip(strPairs) 
+   ptns1 = strPairs[0][0] + ''.join([a[-1] for a in A[1:]])
+   ptns2 = strPairs[0][1] + ''.join([b[-1] for b in B[1:]])
+   l = len(ptns1)
+   if ptns1[k+d:] != ptns2[:l-k-d]:
+      print('WARN: No string spelled by the gapped patterns')
+   return str(ptns1 + ptns2[-(k+d):])
 
 def genomeFromPairs(strPairs:StrPairs, k:int, d:int) -> str:
-   """ Construct genome from ordered pairs, aka "string spelled by gapped patterns"
+   """ Construct genome from pairs
    """
    pairsCnt = len(strPairs)
    A, B = unzipToSeqs(strPairs)
@@ -271,7 +332,7 @@ def genomeFromPairs(strPairs:StrPairs, k:int, d:int) -> str:
    target = a[k+d:]
    bStart = target[:k-1]
    b = genomeFromSeqs(B, 'path', bStart)
-   tried = set[str]() #StrsSet()
+   tried = set() #StrsSet()
    aStart = a[:k-1]
    resLen = pairsCnt + k + d + k-1
    iA = 0 

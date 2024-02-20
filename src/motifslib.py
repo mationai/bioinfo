@@ -5,7 +5,7 @@ from helpers import product
 from seqlib import *
 
 
-def acgtHistogram(motifs:Seqs, initCnt=1) -> dict[str, list[int]]:
+def acgtHistogram(motifs:Seqs, initCnt=1) -> dict: #dict[str, list[int]]:
    """ Returns {
      'A': [position-0 count, position-1 count, ...]
      ...
@@ -31,7 +31,7 @@ def motifsEnum(seqs:Seqs, k:int, d=1, sort=True) -> Seqs:
    gives [ATA ATT GTT TTT]
    """
    # print('seqs',seqs)
-   kmers = set[str]()
+   kmers = set() #set[str]()
    for i, seq in enumerate(seqs):
       # print('to slide',s)
       for kmer in slide(seq, k):
@@ -98,7 +98,7 @@ def ptnProbability(ptn:str, profile:Profile) -> float:
    except IndexError:
       raise IndexError("profile[A|C|G|T]'s value length < ptn's length")
 
-def kmerProbabilities(dna:str, profile:Profile, k:int) -> list[float]:
+def kmerProbabilities(dna:str, profile:Profile, k:int) -> [float]:
    """ All probabilities of kmers in dna
    """
    return [ptnProbability(kmer, profile) for kmer in slide(dna, k)]
@@ -215,7 +215,7 @@ def randomKey(seqProb:SeqFloatDict) -> str:
    aggr = sum(seqProb.values())
    profile = {dna: seqProb[dna]/aggr for dna in seqProb}
    y = 0.0
-   profileSums = dict[str, float]()
+   profileSums = dict() #dict[str, float]()
 
    for dna in profile: #need to add them together so when a number is randomly selected, there will be defined ranges
       y += profile[dna]

@@ -128,15 +128,15 @@ class chap2:
    def _7():
       seqs = parseSeqsStr('CGCCCCTCTCGGGGGTGTTCAGTAAACGGCCA GGGCGAGGTATGTGTAAGTGCCAAGGTGCCAG TAGTACCGAGACCGAAAGAAGTATACAGGCGT TAGATCAAGTTTCAGGTGCACGTCGGTGAACCAA TCCACCAGCTCCACGTGCAATGTTGGCCTA')
       exp = parseSeqsStr('TCTCGGGG CCAAGGTG TACAGGCG TTCAGGTG TCCACGTG')
-      iterRandMotifSearch(seqs, 8) >> testColl(exp)
-      gibbsSampler(seqs, 8) >> testColl(exp)
+      iterRandMotifSearch(seqs, 8) >> testUnordered(exp)
+      gibbsSampler(seqs, 8) >> testUnordered(exp)
 
       l = readlines('dataset_33718_7.txt')
       [k, _] = parseInts(l[0])
       exp = parseSeqsStr('ACCGACAGATTGGGT TCCATGCGATTAGGT ACCCATCGATTAGAG TCCCATCGAGCCGGT TCCCACACATTAGGT TCCGTCCGATTAGGT TCCCATCGCCCAGGT TCCCGGAGATTAGGT TCCCCGGGATTAGGT TCCCATCGATTTCTT TCCCATCAGCTAGGT AAACATCGATTAGGT TCCCATCGATGTCGT TCTATTCGATTAGGT TCCCATGAGTTAGGT TCCCAGATATTAGGT TGTGATCGATTAGGT CACCATCGATTAGGC TCCCATATCTTAGGT TCCCATCGATTAACG')
       res = gibbsSampler(parseSeqsStr(l[1]), k)
       print('7. iter res', res >> sepWithSp)
-      iterRandMotifSearch(res, k) >> testColl(exp)
+      iterRandMotifSearch(res, k) >> testUnordered(exp)
       # gibbs same res
 
    def _7exercises():
@@ -164,7 +164,7 @@ class chap2:
       exp = parseSeqsStr('GTAAATAGTCTAGAT GTTCCTCTGCTTGAT GTTAAGGACCTTGAT GTCTCGCTGCTTGAT GTTAAGCTGCTTTGG GTTAAGCGCTTTGAT GTTAAAGAGCTTGAT GTTAGCATGCTTGAT AAGAAGCTGCTTGAT GTTAAGCTGGGCGAT GTTTTACTGCTTGAT GAGGAGCTGCTTGAT GTTATCTTGCTTGAT GTTAAGCTCAATGAT GTTAAGAAACTTGAT CTTAAGCTGCTTGGG GTTAAGCTGCTAACT GTTAATGAGCTTGAT ACTAAGCTGCTTGAA GTTAAGCTGCAAAAT')
       res = gibbsSampler(parseSeqsStr(l[1]), k)
       print('8. gibs res', res >> sepWithSp)
-      gibbsSampler(res, k, iters) >> testColl(exp)
+      gibbsSampler(res, k, iters) >> testUnordered(exp)
 
 if run(1):
    chap2._1()

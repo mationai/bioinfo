@@ -1,3 +1,4 @@
+from superpipe import pipes
 from extensions import *
 from helpers import *
 from seqlib import *
@@ -106,7 +107,7 @@ def translateProtein(ptn:str) -> str:
    """ Return mapping of ptn - str of CodonTable keys
    """
    if len(ptn) % 3 != 0:
-      print "WARN: translateProtein() requires input of length % 3"
+      print("WARN: translateProtein() requires input of length % 3")
       return ''
    t = CodonLU
    return ''.join([t[str(c)] for c in ptn.split(3, 3) if t[str(c)] != '*'])
@@ -190,11 +191,12 @@ def peptideMass(peptide:str, massLU=AminoMass) -> int:
    """
    return sum(peptideMasses(peptide, massLU))
 
+@pipes
 def linearSpectrum(peptide:str, massLU=AminoMass) -> Ints:
    """ Returns collection of all of the masses of its nonwrapping subpeptides, with
    masses ordered from smallest to largest. 
    """
-   mass = peptideMasses(peptide, massLU) |> runningSums
+   mass = peptideMasses(peptide, massLU) >> runningSums
    l = len(peptide)
    # self-referencing nested ("triangular") loop to iterate through what mass of j - i
    # , which should computes mass of linear subpeptides. 
@@ -238,7 +240,7 @@ def isConsistent(peptide:str, spectrum:Ints, massLU=AminoMass) -> bool:
       S.remove(i)
    return True
 
-def countPeptidesFrom(mass:int, masses=IntIntDict()) -> tuple[int, IntIntDict]:
+def countPeptidesFrom(mass:int, masses=IntIntDict()) -> [int, IntIntDict]:
    """ Returns count of all possible peptides whose mass is mass
    """
    if mass == 0:
@@ -256,7 +258,7 @@ def countPeptidesFrom(mass:int, masses=IntIntDict()) -> tuple[int, IntIntDict]:
    return res, masses
 
 
-def cyclopeptidesSequencing(spectrum:Ints) -> list[Ints]:
+def cyclopeptidesSequencing(spectrum:Ints) -> [Ints]:
    """ Cyclopeptide Sequencing
    A brute force way is to check if spectrum == cycloSpectrum(peptide) for all peptide
     where mass of peptide == parentMass of spectrum. This will take a while however.
@@ -280,7 +282,7 @@ def cyclopeptidesSequencing(spectrum:Ints) -> list[Ints]:
     coincides exactly with its theorectical spectrum.
    """
    peptides = set([''])
-   res = list[Ints]()
+   res = [Ints]()
    expansions = [p for p in expand(list(peptides)) if isConsistent(p, spectrum)]
    parentMass = spectrum[-1]
 
@@ -338,7 +340,7 @@ def topCyclopeptideSequencing(spectrum:Ints, topN:int) -> Ints:
       topPeptides = trimPeptides(list(leaderboard), spectrum, topN)
    return peptideMasses(topPeptide)[::-1]
 
-def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs()) -> list[Ints]:
+def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs()) -> [Ints]:
    """ Like Leaderboard Cyclopeptide Sequencing, but
    Returns all top peptides masses
    """
@@ -371,14 +373,15 @@ def spectralConvolution(spectrum:Ints, gte=57, lte=200) -> Ints:
    """
    return [i-j for i in spectrum for j in spectrum if gte <= i-j <= lte]
 
-def getTopMasses(L:list[SIPair], topN:int) -> Ints:
+def getTopMasses(L:[SIPair], topN:int) -> Ints:
    if len(L) <= topN:
       return [int(x[0]) for x in L]
    minCnt = L[topN-1][1]
    return [int(x[0]) for x in L if x[1] >= minCnt]
 
-def convolutionSequencing(spectrum:Ints, topM=20, topN=60) -> list[Ints]:
-   counts = spectralConvolution(spectrum) |> histogram
+@pipes
+def convolutionSequencing(spectrum:Ints, topM=20, topN=60) -> [Ints]:
+   counts = spectralConvolution(spectrum) >> histogram
    massCnts = [(str(k), v) for k, v in counts.items()]
    sortedMasses = sorted(massCnts, key=getSI1)[::-1]
    topMasses = getTopMasses(sortedMasses, topM)
@@ -402,11 +405,12 @@ def floatsSpectrumToInts(spectrum:Floats) -> Ints:
          rounded.append(mid)
    return sorted(rounded)
     
+@pipes
 def protonMassSpecCyclopeptideSequencing(fSpectrum:Floats, topM:int, topN:int) -> Ints:
    """ Didn't produce correct answer
    """
    spectrum = floatsSpectrumToInts(fSpectrum)
-   counts = spectralConvolution(spectrum) |> histogram
+   counts = spectralConvolution(spectrum) >> histogram
    massCnts = [(str(k), v) for k, v in counts.items()]
    sortedMasses = sorted(massCnts, key=getSI1)[::-1]
    topMasses = getTopMasses(sortedMasses, topM)
@@ -422,7 +426,7 @@ def wrapSubpeptides(peptide:str) -> Strs:
    pLen = len(peptide)
    if pLen < 2:
       return Strs()
-   res = set[str]() #StrsSet()
+   res = set() #StrsSet()
 
    for i in range(1, len(peptide)-2):
       res.add(peptide[-1]+peptide[:i+1])

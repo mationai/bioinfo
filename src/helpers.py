@@ -4,14 +4,14 @@ from sys import argv
 from superpipe import pipes
 from extensions import *
 
-# def histogram[T](L:list[T]) -> dict[T, int]:
-#    res = dict[T, int]()
-#    for i in L:
-#       res[i] = res[i]+1 if i in res else 1
-#    return res
+def histogram(L:list) -> dict: #[T](L:list[T]) -> dict[T, int]:
+   res = dict() #[T, int]()
+   for i in L:
+      res[i] = res[i]+1 if i in res else 1
+   return res
 
-# def runningSums[T](L:list[T]) -> list[T]:
-#    return [sum(L[:i]) for i in range(len(L)+1)]
+def runningSums(L:list) -> list: # [T](L:list[T]) -> list[T]:
+   return [sum(L[:i]) for i in range(len(L)+1)]
 
 # def mergeOrderedSeqs(seqs:list):
 # # def mergeOrderedSeqs[T](seqs:list[T]) -> T:
@@ -62,21 +62,21 @@ def testIn(B:list, a):
    else:
       print("a not in B")
 
-# def testVerbose[T](a:T, b:T):
-#    if a == b:
-#       print("✓ result as expected")
-#       return
-#    iMismatch = Ints()
-#    for i, c in enumerate(a):
-#       if len(b) > i and c != b[i]: 
-#          iMismatch.append(i)
-#    if len(iMismatch) > 10:
-#       print(f"{len(iMismatch)} or more mismatches, eg.:")
-#    cnt = 0
-#    for i in iMismatch:
-#       if cnt < 10:
-#          print(f"{i}: got {a[i]}, expected {b[i]}")
-#          cnt += 1
+def testVerbose(a, b): # [T](a:T, b:T):
+   if a == b:
+      print("✓ result as expected")
+      return
+   iMismatch = Ints()
+   for i, c in enumerate(a):
+      if len(b) > i and c != b[i]: 
+         iMismatch.append(i)
+   if len(iMismatch) > 10:
+      print(f"{len(iMismatch)} or more mismatches, eg.:")
+   cnt = 0
+   for i in iMismatch:
+      if cnt < 10:
+         print(f"{i}: got {a[i]}, expected {b[i]}")
+         cnt += 1
 
 def testVs(exp, res):
 # def testVs[T](exp:T, res:T):
@@ -86,10 +86,10 @@ def testVs(exp, res):
       print("  result:", res)
       print("expected:", exp)
 
-def testColl(A:list, B:list):
-# def testColl[T](A:List[T], B:List[T]):
-   matchedX = set[int]()
-   matchedY = set[int]()
+def testUnordered(A:list, B:list):
+# def testUnordered[T](A:List[T], B:List[T]):
+   matchedX = set() #[int]()
+   matchedY = set() #[int]()
    for x, a in enumerate(A): 
       for y, b in enumerate(B): 
          if a == b and x not in matchedX and y not in matchedY:
@@ -101,23 +101,22 @@ def testColl(A:list, B:list):
       print("  result:", B)
       print("expected:", A)
 
-def parseInts(s:str, sep=' ') -> [int]:#Ints:
+def parseInts(s:str, sep=' ') -> Ints:
    return [int(x) for x in s.split(sep) if x.strip()]
 
 # def parseIntsList(S:Strs, sep=' ') -> list[Ints]:
 #    return [parseInts(s) for s in S]
 
-def parseFloats(s:str, sep=' ') -> [float]:#Floats:
+def parseFloats(s:str, sep=' ') -> Floats:
    return [float(x) for x in s.split(sep) if x.strip()]
 
 # def parseToStrs(s:str, sep=' ') -> Strs:
 #    return [x for x in s.split(sep) if x.strip()]
 
-def parseSeqsStr(s:str, sep=' ') -> [str]:#Seqs:
+def parseSeqsStr(s:str, sep=' ') -> Seqs:
    return [str(x) for x in s.split(sep) if x.strip()]
 
-def parseSeqStrs(S:[str]) -> [str]:
-# def parseSeqStrs(S:Strs) -> Seqs:
+def parseSeqStrs(S:Strs) -> Seqs:
    return [str(x) for x in S if x.strip()]
 
 def parseProfile(d) -> Profile:
@@ -136,12 +135,12 @@ def pairsStrToStrPairs(st:str, sep='\n', pairSep='|') -> StrPairs:
       res.append((a, b))
    return res
 
-# def pairStrsToStrPairs(strs:Strs, sep='\n', pairSep='|') -> StrPairs:
-#    res = StrPairs()
-#    for s in strs:
-#       a, b = s.split(pairSep)
-#       res.append((a, b))
-#    return res
+def pairStrsToStrPairs(strs:Strs, sep='\n', pairSep='|') -> StrPairs:
+   res = [] #StrPairs()
+   for s in strs:
+      a, b = s.split(pairSep)
+      res.append((a, b))
+   return res
 
 # def listToStr[T](L:list[T], sep=' ') -> str:
 #    return sep.join([str(x) for x in L])
@@ -175,11 +174,11 @@ def adjGraphStr(sg:Graph) -> str:
    res = [f"{x}: {' '.join(sg[x])}" for x in sg]
    return '\n'.join(res)
 
-def pathArrowStr[T](S:list[T], arrow=': ') -> str:
+def pathArrowStr(S:list, arrow=': ') -> str:
    return arrow.join([str(s) for s in S])
 
-# def pathsArrowStr[T](SS:list[list[T]], arrow=' -> ') -> str:
-#    return '\n'.join([pathArrowStr(S, arrow) for S in SS])
+def pathsArrowStr(SS:StrMat, arrow=': ') -> str:
+   return '\n'.join([pathArrowStr(S, arrow) for S in SS])
 
 def rmSpaces(s:str) -> str:
    return s.replace(' ', '')
@@ -191,10 +190,10 @@ def dPath(p:str):
 # def file(p:str) -> File:
 #    return open(dPath(p), 'r')
 
-# def read(p:str, sz=100000) -> str:
-#    return open(dPath(p), 'r').read(sz)
+def read(p:str, sz=100000) -> str:
+   return open(dPath(p), 'r').read(sz)
 
-def readlines(p:str) -> list[str]:
+def readlines(p:str) -> Strs:
    f = open(dPath(p), 'r')
    return f.read().splitlines()
 
@@ -240,5 +239,5 @@ def product(nums:list):
 #    return [[v for i in range(xLen)] for j in range(yLen)]
 
 # ## ----- lambda key functions -----
-# def getSI1[T](x:tuple[str, int]) -> int:
-#    return x[1]
+def getSI1(x:tuple) -> int: #[T](x:tuple[str, int]) -> int:
+   return x[1]

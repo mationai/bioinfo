@@ -35,7 +35,7 @@ class chap3:
    def _4():
       s = parseSeqsStr('ATGCG GCATG CATGC AGGCA GGCAT GGCAC')
       r = Seq2Graph(s, 'overlap', 0)
-      r.toStrs() >> testColl([ # sometimes fail
+      r.toStrs() >> testUnordered([ # sometimes fail
          'GCATG: CATGC',
          'CATGC: ATGCG',
          'GGCAT: GCATG',
@@ -63,7 +63,7 @@ class chap3:
 
    def _5():
       r = Seq2Graph(['AAGATTCTCTAAGA'], 'seq', 4)
-      r.toStrs() >> testColl([ # sometimes fail
+      r.toStrs() >> testUnordered([ # sometimes fail
          'AAG: AGA AGA',
          'AGA: GAT',
          'ATT: TTC',
@@ -76,7 +76,7 @@ class chap3:
       ])
 
       r = Seq2Graph(['GCTTCTTC'], 'seq', 4)
-      r.toStrs() >> testColl([
+      r.toStrs() >> testUnordered([
          'GCT: CTT',
          'TTC: TCT',
          'CTT: TTC TTC',
@@ -100,7 +100,7 @@ class chap3:
    def _6():
       s = parseSeqsStr('GAGG CAGG GGGG GGGA CAGG AGGG GGAG')
       r = Seq2Graph(s, 'kmer', 0)
-      r.toStrs() >> testColl([
+      r.toStrs() >> testUnordered([
          'CAG: AGG AGG',
          'AGG: GGG',
          'GGA: GAG',

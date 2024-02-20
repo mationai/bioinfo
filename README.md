@@ -25,7 +25,7 @@ Use python 3.12
 ## Running
 
 ```sh
-python src/cogniterra/1-1.seq     # run all exercises in 1-1.seq
-python src/cogniterra/1-1.seq 1   # run exercise 1 in 1-1.seq
-python src/cogniterra/1-1.seq 2:4 # run exercise 2-4 in 1-1.seq
+python src/cogniterra/1-1.py     # run all exercises in 1-1.seq
+python src/cogniterra/1-1.py 1   # run exercise 1 in 1-1.seq
+python src/cogniterra/1-1.py 2:4 # run exercise 2-4 in 1-1.seq
 ```
