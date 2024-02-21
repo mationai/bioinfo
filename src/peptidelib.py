@@ -343,7 +343,6 @@ def topCyclopeptideSequencing(spectrum:Ints, topN:int) -> Ints:
             if peptideScore(p, spectrum) > peptideScore(topPeptide, spectrum):
                topPeptide = p
          elif mass > parentMass:
-            # leaderboard.remove(p)
             toDel.add(p)
       topPeptides = set(trimPeptides(list(leaderboard), spectrum, topN))
    return peptideMasses(topPeptide)[::-1]
@@ -355,12 +354,14 @@ def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs
    parentMass = spectrum[-1]
    topPeptides = ['']
    leaderboard = set(topPeptides)
+   toDel = set()
    aminos = ExtAminos if aminoKind=='extended' else UniqueMassAminos
    massLU = ExtAminoMass if aminoKind=='extended' else AminoMass
    alphabet = altAminos if len(altAminos) > 0 else aminos
 
    while len(leaderboard) > 0:
-      leaderboard = set(expand(leaderboard, alphabet))
+      leaderboard = set(expand(
+         leaderboard.difference(toDel), alphabet))
       for p in leaderboard:
          mass = peptideMass(p, massLU)
          if mass == parentMass:
@@ -370,14 +371,15 @@ def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs
                topPeptides = [p] if score > topScore else topPeptides+[p]
                # print 'topScore', topScore, 'topPeps', topPeptides
          elif mass > parentMass:
-            leaderboard.remove(p)
+            toDel.add(p)
+            # leaderboard.remove(p)
       leaderboard = set(trimPeptides(list(leaderboard), spectrum, topN, massLU))
    return [peptideMasses(p, massLU) for p in topPeptides]
 
 def spectralConvolution(spectrum:Ints, gte=57, lte=200) -> Ints:
    """ 
    Returns list of elements in the convolution of Spectrum.
-    If an element has multiplicity k, it should appear exactly k times;
+   If an element has multiplicity k, it should appear exactly k times;
    """
    return [i-j for i in spectrum for j in spectrum if gte <= i-j <= lte]
 

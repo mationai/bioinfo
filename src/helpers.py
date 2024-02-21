@@ -52,6 +52,34 @@ def run(n:int) -> bool:
          return True
    return False
 
+def testNoBegEnd(A:list, B:list):
+   a0 = A[0]
+   if a0 not in B:
+      print(a0+" no in B")
+      return False
+   iB = B.index(a0)
+   iA = 0
+   while iB < len(B):
+      print('ib',iB,B[iB],'=?= iA',iA, A[iA])
+      if A[iA] != B[iB]:
+         if A[iA] not in B[iB:]:
+            print(A[iA]+" no in B")
+            return False
+         iB = B[iB:].index(A[iA])
+         continue
+      iA += 1
+      iB += 1
+   iB = 0
+   while iA < len(A):
+      print('>ib',iB,B[iB],'=?= iA',iA, A[iA])
+      if A[iA] != B[iB]:
+         print(A[iA]+" no in B")
+         return False 
+      iA += 1
+      iB += 1
+   print("✓ result as expected")
+   return True
+
 def testIn(B:list, a):
    if any(a==x for x in B):
       print("✓ result as expected")
@@ -103,14 +131,14 @@ def testUnordered(A:list, B:list):
 def parseInts(s:str, sep=' ') -> Ints:
    return [int(x) for x in s.split(sep) if x.strip()]
 
-# def parseIntsList(S:Strs, sep=' ') -> list[Ints]:
-#    return [parseInts(s) for s in S]
+def parseIntsList(S:Strs) -> list: #[Ints]:
+   return [parseInts(s) for s in S]
 
 def parseFloats(s:str, sep=' ') -> Floats:
    return [float(x) for x in s.split(sep) if x.strip()]
 
-# def parseToStrs(s:str, sep=' ') -> Strs:
-#    return [x for x in s.split(sep) if x.strip()]
+def parseToStrs(s:str, sep=' ') -> Strs:
+   return [x for x in s.split(sep) if x.strip()]
 
 def parseSeqsStr(s:str, sep=' ') -> Seqs:
    return [str(x) for x in s.split(sep) if x.strip()]
@@ -159,6 +187,9 @@ def spaceDashed(LL:IntMat, sort=True) -> str:
    for L in LL:
       res.append('-'.join([str(i) for i in L]))
    return ' '.join(sorted(res) if sort else res)
+
+def toStrs(l:list) -> Strs:
+   return [str(x) for x in l]
 
 def toPairsStrs(pairs:Pairs, sep='|') -> Strs:
    """ Returns list of "(a1|b1)" representation of input pairs
