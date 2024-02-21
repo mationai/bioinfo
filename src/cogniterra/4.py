@@ -5,7 +5,6 @@ from dataexpected import expected
 from extensions import *
 from helpers import *
 from peptidelib import *
-from math import log10
 
 @pipes
 class chap4:

@@ -149,11 +149,11 @@ def parseSeqStrs(S:Strs) -> Seqs:
 def parseProfile(d) -> Profile:
    return {str(key): parseFloats(d[i]) for i, key in enumerate('ACGT')}
 
-# def parseMat(st:str, lineSep='\n', sep=' ') -> IntMat:
-#    return [[int(i) for i in line.split(sep)] for line in st.strip().split(lineSep)]
+def parseMat(st:str, lineSep='\n', sep=' ') -> IntMat:
+   return [[int(i) for i in line.split(sep)] for line in st.strip().split(lineSep)]
 
-# def parseMats(st:str, sep='-\n') -> list[IntMat]:
-#    return [parseMat(s) for s in st.split(sep)]
+def parseMats(st:str, sep='-\n') -> list: #[IntMat]:
+   return [parseMat(s) for s in st.split(sep)]
 
 def pairsStrToStrPairs(st:str, sep='\n', pairSep='|') -> StrPairs:
    res = [] #StrPairs()
@@ -169,8 +169,8 @@ def pairStrsToStrPairs(strs:Strs, sep='\n', pairSep='|') -> StrPairs:
       res.append((a, b))
    return res
 
-# def listToStr[T](L:list[T], sep=' ') -> str:
-#    return sep.join([str(x) for x in L])
+def listToStr(L:list, sep=' ') -> str: #[T](L:list[T], sep=' ') -> str:
+   return sep.join([str(x) for x in L])
 
 def toDashed(L:list) -> str: #[T](L:list[T]) -> str:
    return '-'.join([str(i) for i in L])
@@ -222,9 +222,6 @@ def dPath(p:str):
    dir = os.path.dirname(__file__)
    return os.path.join(dir, '../data', p)
 
-# def file(p:str) -> File:
-#    return open(dPath(p), 'r')
-
 def read(p:str, sz=100000) -> str:
    return open(dPath(p), 'r').read(sz)
 
@@ -232,8 +229,7 @@ def readlines(p:str) -> Strs:
    f = open(dPath(p), 'r')
    return f.read().splitlines()
 
-def product(nums:list):
-# def product[T](nums:list[T]) -> T:
+def product(nums:list): # [T](nums:list[T]) -> T:
    res = nums[0]
    for n in nums[1:]:
       if n == 0:
@@ -241,37 +237,37 @@ def product(nums:list):
       res *= n
    return res
 
-# def maxIdx[T](M:list[T], minVal:T) -> int:
-#    iLen = len(M)
-#    score = minVal
-#    iMax = 0
-#    for i in range(iLen):
-#       if M[i] > score:
-#          score = M[i]
-#          iMax = i
-#    return iMax
+def maxIdx(M:list, minVal:int) -> int: #[T](M:list[T], minVal:T) -> int:
+   iLen = len(M)
+   score = minVal
+   iMax = 0
+   for i in range(iLen):
+      if M[i] > score:
+         score = M[i]
+         iMax = i
+   return iMax
 
-# def maxXY[T](M:list[list[T]], minVal:T) -> tuple[int, int]:
-#    jLen = len(M)
-#    iLen = len(M[0])
-#    score = minVal
-#    iMax, jMax = 0, 0
-#    for j in range(jLen):
-#       for i in range(iLen):
-#          if M[j][i] > score:
-#             score = M[j][i]
-#             iMax, jMax = i, j
-#    return iMax, jMax
+def maxXY(M:list, minVal:int) -> tuple: #[T](M:list[list[T]], minVal:T) -> tuple[int, int]:
+   jLen = len(M)
+   iLen = len(M[0])
+   score = minVal
+   iMax, jMax = 0, 0
+   for j in range(jLen):
+      for i in range(iLen):
+         if M[j][i] > score:
+            score = M[j][i]
+            iMax, jMax = i, j
+   return iMax, jMax
 
-# def maxIn[T](M:list[list[T]], minVal:T) -> tuple[int, int]:
-#    i, j = maxXY(M, minVal)
-#    return M[j][i]
+def maxIn(M:list, minVal:int) -> tuple: #[T](M:list[list[T]], minVal:T) -> tuple[int, int]:
+   i, j = maxXY(M, minVal)
+   return M[j][i]
 
-# def zeros(xLen:int, yLen:int) -> IntMat:
-#    return [[0 for i in range(xLen)] for j in range(yLen)]
+def zeros(xLen:int, yLen:int) -> IntMat:
+   return [[0 for i in range(xLen)] for j in range(yLen)]
 
-# def ones(xLen:int, yLen:int, v=1) -> IntMat:
-#    return [[v for i in range(xLen)] for j in range(yLen)]
+def ones(xLen:int, yLen:int, v=1) -> IntMat:
+   return [[v for i in range(xLen)] for j in range(yLen)]
 
 # ## ----- lambda key functions -----
 def getSI1(x:tuple) -> int: #[T](x:tuple[str, int]) -> int:
