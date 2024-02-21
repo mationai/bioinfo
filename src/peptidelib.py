@@ -109,8 +109,8 @@ def translateProtein(ptn:str) -> str:
    if len(ptn) % 3 != 0:
       print("WARN: translateProtein() requires input of length % 3")
       return ''
-   t = CodonLU
-   return ''.join([t[str(c)] for c in ptn.split(3, 3) if t[str(c)] != '*'])
+   lu = CodonLU
+   return ''.join([lu[str(c)] for c in slide(ptn, 3, 3) if lu[str(c)] != '*'])
 
 def permCountsOf(ptn:str) -> int:
    """ Return count of possible keys mapping of ptn (str of CodonTable values)
@@ -123,16 +123,18 @@ def encodePeptide(dna:str, ptn:str) -> Strs:
    res = Strs()
    l = CodonKeyLen
    ptnLen = len(ptn)*l
-   for Ptn in seq(dna).split(ptnLen, 1):
+   for Ptn in slide(dna, ptnLen, 1):
       pVs = ''
       rVs = ''
       P = seqToRNA(Ptn)
       R = seqToRNA(reverseComp(Ptn))
+      # print(Ptn)
       for p, r in [(P[i:i+l], R[i:i+l]) for i in range(0, ptnLen, l)]:
          if str(p) in CodonLU:
             pVs += CodonLU[str(p)]
          if str(r) in CodonLU:
             rVs += CodonLU[str(r)]
+      # print(pVs, ptn, rVs)
       if pVs==ptn or rVs==ptn:
          res.append(str(P))
    return [strToDNA(s) for s in res]
@@ -240,7 +242,7 @@ def isConsistent(peptide:str, spectrum:Ints, massLU=AminoMass) -> bool:
       S.remove(i)
    return True
 
-def countPeptidesFrom(mass:int, masses=IntIntDict()) -> [int, IntIntDict]:
+def countPeptidesFrom(mass:int, masses=dict()) -> tuple: #[int, IntIntDict]:
    """ Returns count of all possible peptides whose mass is mass
    """
    if mass == 0:
@@ -258,7 +260,7 @@ def countPeptidesFrom(mass:int, masses=IntIntDict()) -> [int, IntIntDict]:
    return res, masses
 
 
-def cyclopeptidesSequencing(spectrum:Ints) -> [Ints]:
+def cyclopeptidesSequencing(spectrum:Ints) -> list: #[Ints]:
    """ Cyclopeptide Sequencing
    A brute force way is to check if spectrum == cycloSpectrum(peptide) for all peptide
     where mass of peptide == parentMass of spectrum. This will take a while however.
@@ -281,22 +283,25 @@ def cyclopeptidesSequencing(spectrum:Ints) -> [Ints]:
    Note this method only works in ideal spectrums, ie. when the spectrum of a peptide
     coincides exactly with its theorectical spectrum.
    """
-   peptides = set([''])
-   res = [Ints]()
-   expansions = [p for p in expand(list(peptides)) if isConsistent(p, spectrum)]
+   expansions = [p for p in expand() if isConsistent(p, spectrum)]
+   # print('expansions', expansions)
    parentMass = spectrum[-1]
+   peptides = set([''])
+   res = set()
+   toDel = set()
 
    while len(peptides) > 0:
-      peptides = set(expand(list(peptides), expansions))
+      peptides = set(expand(list(
+         peptides.difference(toDel)), expansions))
       for peptide in peptides:
          if peptideMass(peptide) == parentMass:
             if cycloSpectrum(peptide) == spectrum:
-               res.append(peptideMasses(peptide))
-            peptides.remove(peptide)
+               res.add('-'.join(
+                  [str(p) for p in peptideMasses(peptide)]))
+            toDel.add(peptide)
          elif not isConsistent(peptide, spectrum):
-            peptides.remove(peptide)
-   return list(set(res))
-
+            toDel.add(peptide)
+   return list(res)
 
 def peptideScore(peptide:str, spectrum:Ints, kind='linear', massLU=AminoMass) -> int:
    """ Count (with min()) masses common in both spectrum and in cycloSpectrum of peptide.
@@ -325,22 +330,25 @@ def topCyclopeptideSequencing(spectrum:Ints, topN:int) -> Ints:
    Returns top peptide masses
    """
    parentMass = spectrum[-1]
-   topPeptides = ['']
+   topPeptides = set([''])
    topPeptide = ''
+   toDel = set()
 
    while len(topPeptides) > 0:
-      leaderboard = set(expand(topPeptides))
+      leaderboard = set(expand(
+         topPeptides.difference(toDel)))
       for p in leaderboard:
          mass = peptideMass(p)
          if mass == parentMass:
             if peptideScore(p, spectrum) > peptideScore(topPeptide, spectrum):
                topPeptide = p
          elif mass > parentMass:
-            leaderboard.remove(p)
-      topPeptides = trimPeptides(list(leaderboard), spectrum, topN)
+            # leaderboard.remove(p)
+            toDel.add(p)
+      topPeptides = set(trimPeptides(list(leaderboard), spectrum, topN))
    return peptideMasses(topPeptide)[::-1]
 
-def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs()) -> [Ints]:
+def topPeptidesSequencing(spectrum:Ints, aminoKind='', topN=1000, altAminos=Strs()) -> list: #[Ints]:
    """ Like Leaderboard Cyclopeptide Sequencing, but
    Returns all top peptides masses
    """
@@ -373,14 +381,14 @@ def spectralConvolution(spectrum:Ints, gte=57, lte=200) -> Ints:
    """
    return [i-j for i in spectrum for j in spectrum if gte <= i-j <= lte]
 
-def getTopMasses(L:[SIPair], topN:int) -> Ints:
+def getTopMasses(L:list, topN:int) -> Ints: # L:[SIPair], topN:int) -> Ints:
    if len(L) <= topN:
       return [int(x[0]) for x in L]
    minCnt = L[topN-1][1]
    return [int(x[0]) for x in L if x[1] >= minCnt]
 
 @pipes
-def convolutionSequencing(spectrum:Ints, topM=20, topN=60) -> [Ints]:
+def convolutionSequencing(spectrum:Ints, topM=20, topN=60) -> list: #[Ints]:
    counts = spectralConvolution(spectrum) >> histogram
    massCnts = [(str(k), v) for k, v in counts.items()]
    sortedMasses = sorted(massCnts, key=getSI1)[::-1]

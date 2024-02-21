@@ -22,12 +22,12 @@ class chap3:
       7: 9
       8: 7
       9: 6'''
-      S = eulerianPath(parseGraph(s), 'cycle', '')
+      S = eulerianPath(parseGraph(s), 'cycle')
       pathArrowStr(S, ' ') >> testVs('2 1 0 3 2 6 8 7 9 6 5 4 2')
       # same as '6 8 7 9 6 5 4 2 1 0 3 2 6' in solution
 
       s = '1: 2|2: 1 2|0: 1'
-      S = eulerianPath(parseGraph(s, '|'), 'cycle', '')
+      S = eulerianPath(parseGraph(s, '|'), 'cycle')
       S >> pathArrowStr >> testVs('')
 
       s = '''1: 10
@@ -36,7 +36,7 @@ class chap3:
       3: 10
       4: 5
       5: 10'''
-      S = eulerianPath(parseGraph(s), 'cycle', '')
+      S = eulerianPath(parseGraph(s), 'cycle')
       pathArrowStr(S, ' ')\
          >> testVs('10 2 1 10 3 10 4 5 10')
 
@@ -45,16 +45,16 @@ class chap3:
       2: 0 1 3 4
       3: 0 1 2 4
       4: 0 1 2 3'''
-      S = eulerianPath(parseGraph(s), 'cycle', '')
+      S = eulerianPath(parseGraph(s), 'cycle')
       pathArrowStr(S, ' ')\
          >> testVs('0 1 0 2 0 3 0 4 1 2 1 3 1 4 2 3 2 4 3 4 0')
 
       s = '0: 3 1|1: 2|2: 0|3: 0'
-      S = eulerianPath(parseGraph(s, '|'), 'cycle', '')
+      S = eulerianPath(parseGraph(s, '|'), 'cycle')
       pathArrowStr(S, ' ') >> testVs('0 3 0 1 2 0')
 
       gs = readGraphStrs('dataset_34403_7.txt')
-      S = eulerianPath(gs, 'cycle', '')
+      S = eulerianPath(gs, 'cycle')
       pathArrowStr(S, ' ') >> testVs(expected._3_7)
 
    # Find Eulerian Path
@@ -67,7 +67,7 @@ class chap3:
       7: 8
       8: 9
       9: 6'''
-      S = eulerianPath(parseGraph(s), 'path', '')
+      S = eulerianPath(parseGraph(s), 'path')
       pathArrowStr(S, ' ') >> testVs('6 7 8 9 6 3 0 2 1 3 4')
 
       gs = readGraphStrs('dataset_34403_8a.txt')

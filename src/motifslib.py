@@ -98,7 +98,7 @@ def ptnProbability(ptn:str, profile:Profile) -> float:
    except IndexError:
       raise IndexError("profile[A|C|G|T]'s value length < ptn's length")
 
-def kmerProbabilities(dna:str, profile:Profile, k:int) -> [float]:
+def kmerProbabilities(dna:str, profile:Profile, k:int) -> list: #[float]:
    """ All probabilities of kmers in dna
    """
    return [ptnProbability(kmer, profile) for kmer in slide(dna, k)]

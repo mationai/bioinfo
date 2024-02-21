@@ -45,7 +45,11 @@ def getCountsGraph(g:Graph) -> dict:
          counts[out] = x + 1, y # B = (1, 0)
    return counts
 
-def eulerianPath(sg:Graph, kind:str, start:str) -> Strs:
+def allEulerianCycles():
+   # see 3.12
+   pass
+
+def eulerianPath(sg:Graph, kind:str, start='') -> Strs:
    """ See http://www.graph-magics.com/articles/euler.php
    kind one of:
    'cycle'
@@ -313,7 +317,8 @@ def contigs(kmers:Seqs) -> Strs:
    return [mergeOrderedSeqs(p) for p in paths]
 
 def genomeFromOrderedPairs(strPairs:StrPairs, k:int, d:int) -> str:
-   """ Construct genome from ordered pairs, aka "string spelled by gapped patterns"
+   """ Construct genome from ordered pairs, aka
+   "string spelled by gapped patterns" - see 3.13
    """
    A, B = unzip(strPairs) 
    ptns1 = strPairs[0][0] + ''.join([a[-1] for a in A[1:]])

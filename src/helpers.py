@@ -53,7 +53,6 @@ def run(n:int) -> bool:
    return False
 
 def testIn(B:list, a):
-# def testIn[T](a:T, B:list[T]):
    if any(a==x for x in B):
       print("✓ result as expected")
    elif len(B)==1:
@@ -145,16 +144,21 @@ def pairStrsToStrPairs(strs:Strs, sep='\n', pairSep='|') -> StrPairs:
 # def listToStr[T](L:list[T], sep=' ') -> str:
 #    return sep.join([str(x) for x in L])
 
-# def toDashed[T](L:list[T]) -> str:
-#    return '-'.join([str(i) for i in L])
+def toDashed(L:list) -> str: #[T](L:list[T]) -> str:
+   return '-'.join([str(i) for i in L])
+
+def spaceJoin(L:Strs, sort=True) -> str:
+   """ Returns eg. ['1', '2', '3', '4'] to '1 2 3 4'
+   """
+   return ' '.join(sorted(L) if sort else L)
    
-# def spaceDashed[T](LL:list[list[T]], sort=True) -> str:
-#    """ Returns eg. [[1, 2], [3, 4]] to '1-2 3-4'
-#    """
-#    res = Strs()
-#    for L in LL:
-#       res.append('-'.join([str(i) for i in L]))
-#    return ' '.join(sorted(res) if sort else res)
+def spaceDashed(LL:IntMat, sort=True) -> str:
+   """ Returns eg. [[1, 2], [3, 4]] to '1-2 3-4'
+   """
+   res = Strs()
+   for L in LL:
+      res.append('-'.join([str(i) for i in L]))
+   return ' '.join(sorted(res) if sort else res)
 
 def toPairsStrs(pairs:Pairs, sep='|') -> Strs:
    """ Returns list of "(a1|b1)" representation of input pairs

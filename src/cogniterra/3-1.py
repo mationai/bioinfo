@@ -9,7 +9,7 @@ from seq2graph import Seq2Graph
 
 @pipes
 class chap3:
-   # Genome Path Problem
+   # Genome Path
    def _2():
       S = [kmr for kmr in slide('CAATCCAAC', 5)]
       S >> testVs(parseSeqsStr('CAATC AATCC ATCCA TCCAA CCAAC'))
@@ -20,6 +20,7 @@ class chap3:
       S[0] >> testVs('GACACAGAATTGGACCTCTTGGATCGGTCGTACCTGATTAAGCGCGGAAATTTCGTGGGTCTAAGCGCGAGGTATGTCGTTACCAAGCCAGCATGGTCAG')
       S[-1] >> testVs('AGGATAGGTTGAACCCGGTGTTAGAGCAGCAATAGGGAACGCTCCAGGGTACGCGGGTCAAGTTGGACTCCACCGAGCCTTCCGTCTATACACCCTCTTC')
 
+   # Genome Path
    def _3():
       s = parseSeqsStr('ACCGA CCGAA CGAAG GAAGC AAGCT')
       mergeOrderedSeqs(s) >> testVs('ACCGAAGCT')
