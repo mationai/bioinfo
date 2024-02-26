@@ -1,7 +1,7 @@
 import sys
 from extensions import *
 from helpers import maxXY, maxIdx, zeros
-from graphfns import copyWG
+from graphfns import copyWeightedGraph
 
 sys.setrecursionlimit(10000)
 
@@ -51,7 +51,7 @@ Blosum62 = {'A': {'A': 4, 'C': 0, 'E': -1, 'D': -2, 'G': 0, 'F': -2, 'I': -1, 'H
 Pam250   = {'A': {'A': 2, 'C': -2, 'E': 0, 'D': 0, 'G': 1, 'F': -3, 'I': -1, 'H': -1, 'K': -1, 'M': -1, 'L': -2, 'N': 0, 'Q': 0, 'P': 1, 'S': 1, 'R': -2, 'T': 1, 'W': -6, 'V': 0, 'Y': -3}, 'C': {'A': -2, 'C': 12, 'E': -5, 'D': -5, 'G': -3, 'F': -4, 'I': -2, 'H': -3, 'K': -5, 'M': -5, 'L': -6, 'N': -4, 'Q': -5, 'P': -3, 'S': 0, 'R': -4, 'T': -2, 'W': -8, 'V': -2, 'Y': 0}, 'E': {'A': 0, 'C': -5, 'E': 4, 'D': 3, 'G': 0, 'F': -5, 'I': -2, 'H': 1, 'K': 0, 'M': -2, 'L': -3, 'N': 1, 'Q': 2, 'P': -1, 'S': 0, 'R': -1, 'T': 0, 'W': -7, 'V': -2, 'Y': -4}, 'D': {'A': 0, 'C': -5, 'E': 3, 'D': 4, 'G': 1, 'F': -6, 'I': -2, 'H': 1, 'K': 0, 'M': -3, 'L': -4, 'N': 2, 'Q': 2, 'P': -1, 'S': 0, 'R': -1, 'T': 0, 'W': -7, 'V': -2, 'Y': -4}, 'G': {'A': 1, 'C': -3, 'E': 0, 'D': 1, 'G': 5, 'F': -5, 'I': -3, 'H': -2, 'K': -2, 'M': -3, 'L': -4, 'N': 0, 'Q': -1, 'P': 0, 'S': 1, 'R': -3, 'T': 0, 'W': -7, 'V': -1, 'Y': -5}, 'F': {'A': -3, 'C': -4, 'E': -5, 'D': -6, 'G': -5, 'F': 9, 'I': 1, 'H': -2, 'K': -5, 'M': 0, 'L': 2, 'N': -3, 'Q': -5, 'P': -5, 'S': -3, 'R': -4, 'T': -3, 'W': 0, 'V': -1, 'Y': 7}, 'I': {'A': -1, 'C': -2, 'E': -2, 'D': -2, 'G': -3, 'F': 1, 'I': 5, 'H': -2, 'K': -2, 'M': 2, 'L': 2, 'N': -2, 'Q': -2, 'P': -2, 'S': -1, 'R': -2, 'T': 0, 'W': -5, 'V': 4, 'Y': -1}, 'H': {'A': -1, 'C': -3, 'E': 1, 'D': 1, 'G': -2, 'F': -2, 'I': -2, 'H': 6, 'K': 0, 'M': -2, 'L': -2, 'N': 2, 'Q': 3, 'P': 0, 'S': -1, 'R': 2, 'T': -1, 'W': -3, 'V': -2, 'Y': 0}, 'K': {'A': -1, 'C': -5, 'E': 0, 'D': 0, 'G': -2, 'F': -5, 'I': -2, 'H': 0, 'K': 5, 'M': 0, 'L': -3, 'N': 1, 'Q': 1, 'P': -1, 'S': 0, 'R': 3, 'T': 0, 'W': -3, 'V': -2, 'Y': -4}, 'M': {'A': -1, 'C': -5, 'E': -2, 'D': -3, 'G': -3, 'F': 0, 'I': 2, 'H': -2, 'K': 0, 'M': 6, 'L': 4, 'N': -2, 'Q': -1, 'P': -2, 'S': -2, 'R': 0, 'T': -1, 'W': -4, 'V': 2, 'Y': -2}, 'L': {'A': -2, 'C': -6, 'E': -3, 'D': -4, 'G': -4, 'F': 2, 'I': 2, 'H': -2, 'K': -3, 'M': 4, 'L': 6, 'N': -3, 'Q': -2, 'P': -3, 'S': -3, 'R': -3, 'T': -2, 'W': -2, 'V': 2, 'Y': -1}, 'N': {'A': 0, 'C': -4, 'E': 1, 'D': 2, 'G': 0, 'F': -3, 'I': -2, 'H': 2, 'K': 1, 'M': -2, 'L': -3, 'N': 2, 'Q': 1, 'P': 0, 'S': 1, 'R': 0, 'T': 0, 'W': -4, 'V': -2, 'Y': -2}, 'Q': {'A': 0, 'C': -5, 'E': 2, 'D': 2, 'G': -1, 'F': -5, 'I': -2, 'H': 3, 'K': 1, 'M': -1, 'L': -2, 'N': 1, 'Q': 4, 'P': 0, 'S': -1, 'R': 1, 'T': -1, 'W': -5, 'V': -2, 'Y': -4}, 'P': {'A': 1, 'C': -3, 'E': -1, 'D': -1, 'G': 0, 'F': -5, 'I': -2, 'H': 0, 'K': -1, 'M': -2, 'L': -3, 'N': 0, 'Q': 0, 'P': 6, 'S': 1, 'R': 0, 'T': 0, 'W': -6, 'V': -1, 'Y': -5}, 'S': {'A': 1, 'C': 0, 'E': 0, 'D': 0, 'G': 1, 'F': -3, 'I': -1, 'H': -1, 'K': 0, 'M': -2, 'L': -3, 'N': 1, 'Q': -1, 'P': 1, 'S': 2, 'R': 0, 'T': 1, 'W': -2, 'V': -1, 'Y': -3}, 'R': {'A': -2, 'C': -4, 'E': -1, 'D': -1, 'G': -3, 'F': -4, 'I': -2, 'H': 2, 'K': 3, 'M': 0, 'L': -3, 'N': 0, 'Q': 1, 'P': 0, 'S': 0, 'R': 6, 'T': -1, 'W': 2, 'V': -2, 'Y': -4}, 'T': {'A': 1, 'C': -2, 'E': 0, 'D': 0, 'G': 0, 'F': -3, 'I': 0, 'H': -1, 'K': 0, 'M': -1, 'L': -2, 'N': 0, 'Q': -1, 'P': 0, 'S': 1, 'R': -1, 'T': 3, 'W': -5, 'V': 0, 'Y': -3}, 'W': {'A': -6, 'C': -8, 'E': -7, 'D': -7, 'G': -7, 'F': 0, 'I': -5, 'H': -3, 'K': -3, 'M': -4, 'L': -2, 'N': -4, 'Q': -5, 'P': -6, 'S': -2, 'R': 2, 'T': -5, 'W': 17, 'V': -6, 'Y': 0}, 'V': {'A': 0, 'C': -2, 'E': -2, 'D': -2, 'G': -1, 'F': -1, 'I': 4, 'H': -2, 'K': -2, 'M': 2, 'L': 2, 'N': -2, 'Q': -2, 'P': -1, 'S': -1, 'R': -2, 'T': 0, 'W': -6, 'V': 4, 'Y': -2}, 'Y': {'A': -3, 'C': 0, 'E': -4, 'D': -4, 'G': -5, 'F': 7, 'I': -1, 'H': 0, 'K': -4, 'M': -2, 'L': -1, 'N': -2, 'Q': -4, 'P': -5, 'S': -3, 'R': -4, 'T': -3, 'W': 0, 'V': -2, 'Y': 10}}
 
 def LCSBackTrack(v:str, w:str, penalty=0, method='', matchScore=1) -> list: #[StrMat, int, int, int]:
-   """ Longest Common Subsequence Backtrack
+   """ 5.8 Longest Common Subsequence Backtrack
    Returns Mat of Backtracking pointers (symbols)
    method - 'global', 'local', 'fit', 'overlap'
    matchScore - score for a match, used by fit & overlap
@@ -203,8 +203,22 @@ def overlapAlignment(v:str, w:str, penalty=2) -> list: #[int, Strs]:
    return score, strs
 
 
-def topologicalSort(wg:WGraph) -> WPaths:
-   """ Sorts weighted graph from shortest to longest
+# TopologicalOrdering(Graph)
+#     List ← empty list
+#     Candidates ←  set of all nodes in Graph with no incoming edges
+#     while Candidates is non-empty
+#         select an arbitrary node a from Candidates
+#         add a to the end of List and remove it from Candidates
+#         for each outgoing edge from a to another node b
+#             remove edge (a, b) from Graph
+#             if b has no other incoming edges 
+#                 add b to Candidates
+#     if Graph has edges that have not been removed
+#         return "the input graph is not a DAG"
+#     else
+#         return List
+def topologicalSort(graph:WtGraph) -> WPaths:
+   """ 5.17 Sorts weighted graph from shortest to longest
    Eg.: [
       (0, [(1, 1), (3, 10)])]
       (1, [(2, 1)]),
@@ -212,7 +226,7 @@ def topologicalSort(wg:WGraph) -> WPaths:
    ] => 0 with 2 edges will be last
    """
    visited = list() #WPaths()
-   unvisited = copyWG(wg)
+   unvisited = copyWeightedGraph(graph)
    toDel = set()
    while len(list(unvisited.keys())) - len(toDel) > 0:
       cyclic = True
@@ -228,22 +242,27 @@ def topologicalSort(wg:WGraph) -> WPaths:
             cyclic = False
             toDel.add(src)
             visited.append((src, edges))
-      if cyclic:
-         raise ValueError("Graph is cyclic, not a DAG")
+   if cyclic:
+      raise ValueError("Graph is cyclic, not a DAG")
    return visited
 
 def longestWeightedPath(sortedWtPaths:WPaths, source:str) -> list: #[int, Strs]:
    """ Returns the longest weighted DAG path from source in graph defined by sortedWtPaths
+   FIXME - returns just the greedy result w/o backtracking
    """
-   lens = dict() #dict[str, int]()
+   wts = dict() #dict[str, int]()
    paths = dict() #dict[str, Strs]()
    for src, edges in sortedWtPaths:
-      lens[src] = 0
+      wts[src] = 0
       paths[src] = Strs()
       for dst, wt in edges:
-         lens[dst] = 0 if dst not in lens else lens[dst]
-         paths[dst] = Strs() if dst not in paths else paths[dst]
-         if lens[src] < lens[dst] + wt:
-            lens[src] = lens[dst] + wt
+         if dst not in wts:
+            wts[dst] = 0
+         if dst not in paths:
+            paths[dst] = Strs()
+         print('true?', wts[src] < wts[dst] + wt)
+         if wts[src] < wts[dst] + wt:
+            wts[src] = wts[dst] + wt
             paths[src] = [dst] + paths[dst]
-   return lens[source], [source]+paths[source]
+         print('d',dst,'wt',wt,'src',src, 'wts',wts,'paths',paths)
+   return wts[source], [source]+paths[source]

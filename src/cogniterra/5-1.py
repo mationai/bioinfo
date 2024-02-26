@@ -62,28 +62,30 @@ class chap5:
 
    # Longest Path in DAG
    def _5():
-      wg = parseWGraph('''0->1:7
-0->2:4
-2->3:2
-1->4:1
-3->4:3''')
+      wg = parseWtGraph('''0 1 7
+0 2 4
+2 3 2
+1 4 1
+3 4 3''')
       paths = topologicalSort(wg)
+      print('paths',paths)
       d, p = longestWeightedPath(paths, '0')
+      print(paths, 'd',d,'p', p, 'wg',wg)
       res = pathArrowStr(p, ' ')
       f"{d}\n{res}" >> testVs('9\n0 2 3 4')
 
-      wg = parseWGraph('''0->1:1
-0->3:10
-1->2:1
-2->3:1''')
-      paths = topologicalSort(wg)
-      d, p = longestWeightedPath(paths, '0')
-      res = pathArrowStr(p, '->')
-      f"{d}\n{res}" >> testVs('10\n0->3')
+#       wg = parseWGraph('''0->1:1
+# 0->3:10
+# 1->2:1
+# 2->3:1''')
+#       paths = topologicalSort(wg)
+#       d, p = longestWeightedPath(paths, '0')
+#       res = pathArrowStr(p, '->')
+#       f"{d}\n{res}" >> testVs('10\n0->3')
 
    def _6():
       l = readlines('dataset_245_7.txt')
-      wg = parseWGraph('\n'.join(l[2:]))
+      wg = parseWtGraph('\n'.join(l[2:]))
       paths = topologicalSort(wg)
       d, p = longestWeightedPath(paths, l[0])
       res = pathArrowStr(p, '->')
@@ -97,3 +99,5 @@ if run(4):
    chap5._4()
 if run(5):
    chap5._5()
+if run(6):
+   chap5._6()

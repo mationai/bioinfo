@@ -12,15 +12,26 @@ def parseGraph(st:str, sep='\n', arrow=': ') -> Graph:
       res[lf] = rt.split(' ') if ' ' in rt else [rt]
    return res
 
-def parseWGraph(st:str, sep='\n', arrow='->', wtSep=':') -> WGraph:
+def parseWtGraph(st:str, sep='\n', arrow=' ', wtSep=' ') -> WtGraph:
    """ parse weight graph string to WGraph, Eg.
-   0->1:1  0->3:10  1->2:1  2->3:1 =>
+   0:1 1  0:3 10  1:2 1  2:3 1 =>
    0: [(1,1), (3,10)],  1:[(2,1)],  2:[(3,1)]
+   res: [
+      ('0', [('1', 7), ('2', 4)]),
+      ('2', [('3', 2)]),
+      ('1', [('4', 1)]),
+      ('3', [('4', 3)])
+   ]
+     d 7 p ['0', '1'] wg {'0': [('1', 7), ('2', 4)], '2': [('3', 2)], '1': [('4', 1)], '3': [('4', 3)]}
+
    """
    res = dict() #WGraph()
    for s in [s.strip() for s in st.split(sep)]:
-      src, rt = s.split(arrow)
-      dst, wt = rt.split(wtSep)
+      if arrow == wtSep:
+         src, dst, wt = s.split(arrow)
+      else:
+         src, rt = s.split(arrow)
+         dst, wt = rt.split(wtSep)
       res[src] = res[src]+[(dst, int(wt))] if src in res else [(dst, int(wt))]
    return res
 
@@ -28,7 +39,7 @@ def readGraphStrs(p:str) -> Graph:
    s = '\n'.join(open(dPath(p), 'r').readlines())
    return parseGraph(s)
 
-def copyWG(wg:WGraph) -> WGraph:
+def copyWeightedGraph(wg:WtGraph) -> WtGraph:
    return {k: v[:] for k, v in wg.items()}
 
 def getCountsGraph(g:Graph) -> dict:
